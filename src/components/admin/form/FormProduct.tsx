@@ -21,6 +21,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { ModalVariant } from "../modal/ModalVariant";
 import { useState } from "react";
+import { createProduct } from "@/lib/api/products";
 
 export interface FormValues {
   name: string;
@@ -44,8 +45,41 @@ export function FormProduct() {
     variants: [],
   });
 
-  const handleSubmit = () => {
-    console.log(values);
+  const handleSubmit = async () => {
+
+    const productData = {
+      "title": "Piscina pato",
+      "description": "picina de buena calidad",
+      "subCategoryId":3,
+      "variants": [
+        {
+          "attribute": "Tamaño",
+          "value": "XS",
+          "price": 5,
+          "stock": 50
+        },
+        {
+          "attribute": "Tamaño",
+          "value": "S",
+          "price": 10,
+          "stock": 50
+        },
+        {
+          "attribute": "Tamaño",
+          "value": "L",
+          "price": 15,
+          "stock": 50
+        }
+      ]
+    };
+    try {
+      await createProduct(productData);
+    } catch (error) {
+      console.error(error);
+    }
+   
+
+
   };
 
   const handleRemoveVariant = (index: number) => {
