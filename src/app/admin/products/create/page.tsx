@@ -1,4 +1,4 @@
-import { FormProduct } from "@/components/admin/form/FormProduct";
+import { FormProduct } from "@/components/admin/products/FormProduct"
 
 export default function CreateProductPage() {
   return (
