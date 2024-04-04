@@ -8,6 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { productSchema } from "@/validations/productSchema";
@@ -26,34 +27,73 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { createProduct } from "@/lib/api/products";
 
 export const FormCreateProduct = () => {
   const [variants, setVariants] = useState([
-    { attribute: "", price: "", stock: "" ,value:""},
+    { attribute: "", price: "", stock: "", value: "" },
   ]);
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-        title: "",
-        description: "",
-        subCategoryId: 1,
-        // variants: [],
+      title: "",
+      description: "",
+      subCategoryId: 1,
+      variants: [],
     },
   });
 
   const addVariant = () => {
-    setVariants([...variants, { attribute: "", price: "", stock: "",value:"" }]);
+    setVariants([
+      ...variants,
+      { attribute: "", price: "", stock: "", value: "" },
+    ]);
   };
 
-  
+  async function onSubmit(values: z.infer<typeof productSchema>) {
+    const newProduct = {
+      title: values.title,
+      description: values.description,
+      subCategoryId: values.subCategoryId,
+      variants: variants,
+    };
 
+    try {
+      const formattedVariants = variants.map(variant => ({
+        ...variant,
+        price: Number(variant.price),
+        stock: Number(variant.stock),
+      }));
 
-  function onSubmit(values: z.infer<typeof productSchema>) {
-      const newValues = {...values, variants: variants}
-    
-      console.log(variants);
-    // ✅ This will be type-safe and validated.
-    console.log(newValues);
+      const newProduct = {
+        title: values.title,
+        description: values.description,
+        subCategoryId: values.subCategoryId,
+        variants: formattedVariants,
+      };
+
+      await createProduct(newProduct);
+
+      form.reset();
+      setVariants([{ attribute: "", price: "", stock: "", value: "" }]);
+
+      toast({
+        title: "Producto creado",
+        description: "El producto se ha creado correctamente",
+        status: "success",
+        className: "bg-green-500 text-white",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error al crear producto",
+        description: "Hubo un error al crear el producto",
+        status: "error",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
   }
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -136,19 +176,6 @@ export const FormCreateProduct = () => {
             </Button>
             {variants.map((variant, index) => (
               <div key={index} className="flex gap-2">
-                {/* <Input
-                  type="text"
-                  placeholder="Atributo"
-                  value={variant.attribute}
-                  onChange={(e) =>
-                    setVariants((prev) => {
-                      console.log(prev);
-                      const copy = [...prev];
-                      copy[index].attribute = e.target.value;
-                      return copy;
-                    })
-                  }
-                /> */}
                 <Select
                   onValueChange={(value) => {
                     setVariants((prev) => {
@@ -181,22 +208,19 @@ export const FormCreateProduct = () => {
                   }
                 />
 
-                
                 <Input
                   type="number"
                   placeholder="Precio"
                   value={variant.price}
-                  onChange={(e) =>{
+                  onChange={(e) => {
                     setVariants((prev) => {
                       const copy = [...prev];
                       copy[index].price = e.target.value;
                       return copy;
-                    })
-                  
+                    });
                   }}
                 />
                 <Input
-            
                   type="number"
                   placeholder="Stock"
                   value={variant.stock}

@@ -1,3 +1,4 @@
+import { ProductSchema } from "@/validations/productSchema";
 import { getSession } from "next-auth/react";
 
 
@@ -14,16 +15,13 @@ export const getProducts = async () => {
 
 };
 
-export const createProduct = async (productData:any) => {
+export const createProduct = async (productData:ProductSchema) => {
     // console.log(productData)
     const session = await getSession();
     
     const token = session!.user?.access_token;
 
-    
- 
 
-    console.log(token)
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`,{
         method: 'POST',
         headers: {
