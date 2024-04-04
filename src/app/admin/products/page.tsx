@@ -1,27 +1,10 @@
+import { columsProducts } from "@/components/admin/products/columns";
+import { DataTable } from "@/components/admin/products/data-table";
 import { TableProducts } from "@/components/component/table";
+import { products } from "@/data/products";
 import Link from "next/link";
 import React from "react";
 
-const products = [
-  {
-    id: 1,
-    name: "Producto 1",
-    price: 100,
-    category: "Categoría 1",
-  },
-  {
-    id: 2,
-    name: "Producto 2",
-    price: 200,
-    category: "Categoría 2",
-  },
-  {
-    id: 3,
-    name: "Producto 3",
-    price: 300,
-    category: "Categoría 3",
-  },
-];
 
 export default function ProducsPage() {
   return (
@@ -66,7 +49,8 @@ export default function ProducsPage() {
           </div>
         </div> */}
 
-        <TableProducts />
+        {/* <TableProducts /> */}
+        <DataTable columns={columsProducts} data={products} />
       </div>
     </div>
   );
