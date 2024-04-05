@@ -29,6 +29,8 @@ import {
 import { useState } from "react";
 import { createProduct } from "@/lib/api/products";
 
+
+
 export const FormCreateProduct = () => {
   const [variants, setVariants] = useState([
     { attribute: "", price: "", stock: "", value: "" },
