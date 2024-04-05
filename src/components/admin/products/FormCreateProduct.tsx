@@ -52,15 +52,9 @@ export const FormCreateProduct = () => {
   };
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
-    const newProduct = {
-      title: values.title,
-      description: values.description,
-      subCategoryId: values.subCategoryId,
-      variants: variants,
-    };
-
+  
     try {
-      const formattedVariants = variants.map(variant => ({
+      const formattedVariants = variants.map((variant) => ({
         ...variant,
         price: Number(variant.price),
         stock: Number(variant.stock),
@@ -81,15 +75,13 @@ export const FormCreateProduct = () => {
       toast({
         title: "Producto creado",
         description: "El producto se ha creado correctamente",
-        status: "success",
+
         className: "bg-green-500 text-white",
       });
     } catch (error) {
-      console.error(error);
       toast({
         title: "Error al crear producto",
         description: "Hubo un error al crear el producto",
-        status: "error",
         className: "bg-red-500 text-white",
       });
       return;

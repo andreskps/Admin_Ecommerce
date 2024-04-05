@@ -1,12 +1,16 @@
 import { columsProducts } from "@/components/admin/products/columns";
 import { DataTable } from "@/components/admin/products/data-table";
 import { TableProducts } from "@/components/component/table";
-import { products } from "@/data/products";
 import Link from "next/link";
 import React from "react";
+import { getProductsAdmin } from "@/lib/api/products";
+import { products } from "@/data/products";
 
+export default async function ProducsPage() {
+  
+  const products = await getProductsAdmin();
 
-export default function ProducsPage() {
+  console.log(products);
   return (
     <div className="flex flex-col">
       <div className="-m-1.5 overflow-x-auto">

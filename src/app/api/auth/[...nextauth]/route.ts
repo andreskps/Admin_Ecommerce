@@ -11,7 +11,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials, req) {
-       
         const payload = {
           email: credentials!.email,
           password: credentials!.password,
@@ -49,9 +48,6 @@ export const authOptions: NextAuthOptions = {
       // if (user.roles?.includes("admin")) {
       //   return "/admin";
       // }
-
-      
-
 
       // return "/";
       return true;
