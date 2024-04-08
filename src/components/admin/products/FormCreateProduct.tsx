@@ -11,7 +11,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
-import { productSchema } from "@/validations/productSchema";
+import { ProductSchema, productSchema } from "@/validations/productSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,52 +27,75 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { createProduct } from "@/lib/api/products";
+import { createProduct, updateVariant } from "@/lib/api/products";
+import { useFieldArray } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { revalidatePath } from "next/cache";
 
+interface Props {
+  product?: ProductSchema;
+}
 
-
-export const FormCreateProduct = () => {
-  const [variants, setVariants] = useState([
-    { attribute: "", price: "", stock: "", value: "" },
-  ]);
+export const FormCreateProduct = ({ product }: Props) => {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      subCategoryId: 1,
-      variants: [],
+      ...product,
     },
   });
 
-  const addVariant = () => {
-    setVariants([
-      ...variants,
-      { attribute: "", price: "", stock: "", value: "" },
-    ]);
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "variants",
+  });
+
+  form.watch("variants");
+  const añadirVariante = () => {
+    append({
+      attribute: "",
+      price: 0, // Update the value to a number
+      stock: 0, // Update the value to a number
+      value: "",
+    });
   };
 
-  async function onSubmit(values: z.infer<typeof productSchema>) {
-  
+  async function handleUpdateVariant(index: number) {
+    const variant = form.getValues(`variants.${index}`);
+
     try {
-      const formattedVariants = variants.map((variant) => ({
-        ...variant,
-        price: Number(variant.price),
-        stock: Number(variant.stock),
-      }));
+      await updateVariant(
+        variant as {
+          id: string;
+          attribute: string;
+          value: string;
+          price: number;
+          stock: number;
+        }
+      );
 
-      const newProduct = {
-        title: values.title,
-        description: values.description,
-        subCategoryId: values.subCategoryId,
-        variants: formattedVariants,
-      };
+      toast({
+        title: "Variante actualizada",
+        description: "La variante se ha actualizado correctamente",
+        className: "bg-green-500 text-white",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error al actualizar variante",
+        description: "Hubo un error al actualizar la variante",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+  }
 
-      await createProduct(newProduct);
+  async function onSubmit(values: z.infer<typeof productSchema>) {
+    try {
+      // await createProduct(values);
+      values.id ? console.log("editar") : console.log("crear");
 
       form.reset();
-      setVariants([{ attribute: "", price: "", stock: "", value: "" }]);
 
       toast({
         title: "Producto creado",
@@ -81,6 +104,7 @@ export const FormCreateProduct = () => {
         className: "bg-green-500 text-white",
       });
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error al crear producto",
         description: "Hubo un error al crear el producto",
@@ -92,7 +116,7 @@ export const FormCreateProduct = () => {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader className="space-y-2">
-        <CardTitle>Crear Producto</CardTitle>
+        <CardTitle>{product ? "Editar Producto" : "Crear Producto"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Form {...form}>
@@ -145,6 +169,7 @@ export const FormCreateProduct = () => {
                       onValueChange={(value) => {
                         form.setValue("subCategoryId", parseInt(value));
                       }}
+                      // defaultValue={product?.subCategoryId.toString()}
                     >
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Seleccione categoria" />
@@ -165,76 +190,141 @@ export const FormCreateProduct = () => {
               )}
             />
 
-            <Button type="button" onClick={addVariant}>
+            <Button type="button" onClick={añadirVariante}>
               Agregar Variante
             </Button>
-            {variants.map((variant, index) => (
-              <div key={index} className="flex gap-2">
-                <Select
-                  onValueChange={(value) => {
-                    setVariants((prev) => {
-                      const copy = [...prev];
-                      copy[index].attribute = value;
-                      return copy;
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Atributo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="color">Color</SelectItem>
-                      <SelectItem value="size">Tamaño</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="text"
-                  placeholder="Valor"
-                  value={variant.value}
-                  onChange={(e) =>
-                    setVariants((prev) => {
-                      const copy = [...prev];
-                      copy[index].value = e.target.value;
-                      return copy;
-                    })
-                  }
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex gap-2 items-start">
+                {/* <div className="flex flex-col">
+                  <Label className="text-gray-700">Atributo</Label>
+                  <Select
+                    onValueChange={(value) => {
+                      form.setValue(`variants.${index}.attribute`, value);
+                    }}
+                    defaultValue={field.attribute}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Atributo" />
+                    </SelectTrigger>
+                    <SelectContent className="w-[180px]">
+                      <SelectGroup>
+                        <SelectItem value="color">Color</SelectItem>
+                        <SelectItem value="size">Tamaño</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div> */}
+                <FormField
+                  control={form.control}
+                  name={`variants.${index}.attribute`}
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel className="text-sm" htmlFor="attribute">
+                        Atributo
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={(value) => field.onChange(value)}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Atributo" />
+                          </SelectTrigger>
+                          <SelectContent className="w-[180px]">
+                            <SelectGroup>
+                              <SelectItem value="color">Color</SelectItem>
+                              <SelectItem value="size">Tamaño</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`variants.${index}.value`}
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel className="text-sm" htmlFor="value">
+                        Valor
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Valor" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
                 />
 
-                <Input
-                  type="number"
-                  placeholder="Precio"
-                  value={variant.price}
-                  onChange={(e) => {
-                    setVariants((prev) => {
-                      const copy = [...prev];
-                      copy[index].price = e.target.value;
-                      return copy;
-                    });
-                  }}
+                {/* <div className="flex flex-col">
+                  <Label className="text-gray-700">Precio</Label>
+                  <Input
+                    type="number"
+                    placeholder="Precio"
+                    className="mt-1"
+                    {...form.register(`variants.${index}.price`)}
+                  />
+                </div> */}
+
+                <FormField
+                  control={form.control}
+                  name={`variants.${index}.price`}
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel className="text-sm" htmlFor="price">
+                        Precio
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Precio"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          } // Convierte el valor a un número
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
                 />
-                <Input
-                  type="number"
-                  placeholder="Stock"
-                  value={variant.stock}
-                  onChange={(e) =>
-                    setVariants((prev) => {
-                      const copy = [...prev];
-                      copy[index].stock = e.target.value;
-                      return copy;
-                    })
-                  }
+
+                <FormField
+                  control={form.control}
+                  name={`variants.${index}.stock`}
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel className="text-sm" htmlFor="stock ">
+                        Stock
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Stock"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          } // Convierte el valor a un número
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
                 />
+
                 <Button
-                  className="bg-red-500 text-white hover:bg-red-600"
-                  onClick={() => {
-                    setVariants((prev) => {
-                      const copy = [...prev];
-                      copy.splice(index, 1);
-                      return copy;
-                    });
-                  }}
+                  type="button"
+    
+                  onClick={() => handleUpdateVariant(index)}
+                >
+                  Editar variante
+                </Button>
+
+                <Button
+                  className="bg-red-500 text-white hover:bg-red-600 self-end"
+                  onClick={() => remove(index)}
                 >
                   Eliminar
                 </Button>
@@ -242,7 +332,7 @@ export const FormCreateProduct = () => {
             ))}
 
             <Button className="w-full" type="submit">
-              Crear Producto
+              {product ? "Editar Producto" : "Crear Producto"}
             </Button>
           </form>
         </Form>
