@@ -7,7 +7,7 @@ export const productSchema = z.object({
     subCategoryId: z.number(),
     variants: z.array(
         z.object({
-            id: z.string().optional(),
+            id: z.number().optional(),
             attribute: z.string(),
             value: z.string(),
             price: z.number().min(0, "El precio no puede ser menor a 0"),

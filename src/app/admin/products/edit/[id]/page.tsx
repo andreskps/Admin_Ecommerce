@@ -22,10 +22,6 @@ export default async function EditProductPage({ params }: Props) {
 
   const product = await res.json();
 
-
-
-  console.log(product);
-
   // const prouct: ProductSchema = {
   //   id: id,
   //   title: "Producto 1",

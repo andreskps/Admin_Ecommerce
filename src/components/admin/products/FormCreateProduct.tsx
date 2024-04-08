@@ -27,10 +27,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { createProduct, updateVariant } from "@/lib/api/products";
+import { createProduct, updateProduct, updateVariant } from "@/lib/api/products";
 import { useFieldArray } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { revalidatePath } from "next/cache";
+import { useRouter } from 'next/navigation';
 
 interface Props {
   product?: ProductSchema;
@@ -38,10 +38,14 @@ interface Props {
 
 export const FormCreateProduct = ({ product }: Props) => {
   const { toast } = useToast();
+  const router = useRouter();
+
+
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       ...product,
+      
     },
   });
 
@@ -50,7 +54,7 @@ export const FormCreateProduct = ({ product }: Props) => {
     name: "variants",
   });
 
-  form.watch("variants");
+  // form.watch("variants");
   const añadirVariante = () => {
     append({
       attribute: "",
@@ -66,7 +70,7 @@ export const FormCreateProduct = ({ product }: Props) => {
     try {
       await updateVariant(
         variant as {
-          id: string;
+          id: number;
           attribute: string;
           value: string;
           price: number;
@@ -92,8 +96,10 @@ export const FormCreateProduct = ({ product }: Props) => {
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
-      // await createProduct(values);
-      values.id ? console.log("editar") : console.log("crear");
+    
+
+      (values.id) ? await updateProduct(values) : await createProduct(values);
+      
 
       form.reset();
 
@@ -103,6 +109,8 @@ export const FormCreateProduct = ({ product }: Props) => {
 
         className: "bg-green-500 text-white",
       });
+
+      router.push('/admin/products')
     } catch (error) {
       console.log(error);
       toast({
@@ -116,10 +124,16 @@ export const FormCreateProduct = ({ product }: Props) => {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader className="space-y-2">
+      
         <CardTitle>{product ? "Editar Producto" : "Crear Producto"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+       
         <Form {...form}>
+          <div>
+          {JSON.stringify(form.formState.errors)}
+          </div>
+       
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
@@ -258,16 +272,7 @@ export const FormCreateProduct = ({ product }: Props) => {
                   )}
                 />
 
-                {/* <div className="flex flex-col">
-                  <Label className="text-gray-700">Precio</Label>
-                  <Input
-                    type="number"
-                    placeholder="Precio"
-                    className="mt-1"
-                    {...form.register(`variants.${index}.price`)}
-                  />
-                </div> */}
-
+            
                 <FormField
                   control={form.control}
                   name={`variants.${index}.price`}
@@ -314,13 +319,13 @@ export const FormCreateProduct = ({ product }: Props) => {
                   )}
                 />
 
-                <Button
+                {/* <Button
                   type="button"
     
                   onClick={() => handleUpdateVariant(index)}
                 >
                   Editar variante
-                </Button>
+                </Button> */}
 
                 <Button
                   className="bg-red-500 text-white hover:bg-red-600 self-end"

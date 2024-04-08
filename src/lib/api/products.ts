@@ -7,7 +7,6 @@ import { productSchema } from '../../validations/productSchema';
 export const getProductsAdmin = async () => {
   const session = await getSession();
 
-  console.log(session);
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/products/admin`,
     {
@@ -19,8 +18,6 @@ export const getProductsAdmin = async () => {
       },
     }
   );
-
-  console.log(res);
 
   if (!res.ok) {
     throw new Error(`Error: ${res.status} ${res.statusText}`);
@@ -98,7 +95,7 @@ export const getProduct = async (id: string) => {
 };
 
 export const updateVariant = async (variant:{
-  id: string;
+  id: number;
   attribute: string;
   value: string;
   price: number;
@@ -140,4 +137,38 @@ export const updateVariant = async (variant:{
   }
 };
 
+export const updateProduct = async (productData: ProductSchema) => {
+  const { id,variants, ...rest } = productData;
+  try {
+    const session = await getSessionClient();
+
+    if (!session || !session.user?.access_token) {
+      throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+        body: JSON.stringify(rest),
+      }
+    );
+  
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
