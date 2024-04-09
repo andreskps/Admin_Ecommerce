@@ -27,10 +27,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { createProduct, updateProduct, updateVariant } from "@/lib/api/products";
+import {
+  createProduct,
+  createVariant,
+  updateProduct,
+  updateVariant,
+} from "@/lib/api/products";
 import { useFieldArray } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface Props {
   product?: ProductSchema;
@@ -40,12 +45,10 @@ export const FormCreateProduct = ({ product }: Props) => {
   const { toast } = useToast();
   const router = useRouter();
 
-
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       ...product,
-      
     },
   });
 
@@ -58,8 +61,8 @@ export const FormCreateProduct = ({ product }: Props) => {
   const añadirVariante = () => {
     append({
       attribute: "",
-      price: 0, // Update the value to a number
-      stock: 0, // Update the value to a number
+      price: 0,
+      stock: 0,
       value: "",
     });
   };
@@ -67,24 +70,17 @@ export const FormCreateProduct = ({ product }: Props) => {
   async function handleUpdateVariant(index: number) {
     const variant = form.getValues(`variants.${index}`);
 
-    try {
-      await updateVariant(
-        variant as {
-          id: number;
-          attribute: string;
-          value: string;
-          price: number;
-          stock: number;
-        }
-      );
+    const response = await updateVariant(
+      variant as {
+        id: number;
+        attribute: string;
+        value: string;
+        price: number;
+        stock: number;
+      }
+    );
 
-      toast({
-        title: "Variante actualizada",
-        description: "La variante se ha actualizado correctamente",
-        className: "bg-green-500 text-white",
-      });
-    } catch (error) {
-      console.log(error);
+    if (!response.ok) {
       toast({
         title: "Error al actualizar variante",
         description: "Hubo un error al actualizar la variante",
@@ -92,14 +88,43 @@ export const FormCreateProduct = ({ product }: Props) => {
       });
       return;
     }
+
+    toast({
+      title: "Variante actualizada",
+      description: "La variante se ha actualizado correctamente",
+      className: "bg-green-500 text-white",
+    });
+  }
+
+  async function handleCreateVariant(index: number) {
+    const variant = form.getValues(`variants.${index}`);
+
+    if (!product) return;
+    const response = await createVariant({
+      ...variant,
+      product_id: product?.id 
+    });
+
+    if (!response.ok) {
+      toast({
+        title: "Error al crear variante",
+        description: "Hubo un error al crear la variante",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    toast({
+      title: "Variante creada",
+      description: "La variante se ha creado correctamente",
+      className: "bg-green-500 text-white",
+    });
+
   }
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
-    
-
-      (values.id) ? await updateProduct(values) : await createProduct(values);
-      
+      values.id ? await updateProduct(values) : await createProduct(values);
 
       form.reset();
 
@@ -110,9 +135,8 @@ export const FormCreateProduct = ({ product }: Props) => {
         className: "bg-green-500 text-white",
       });
 
-      router.push('/admin/products')
+      router.push("/admin/products");
     } catch (error) {
-      console.log(error);
       toast({
         title: "Error al crear producto",
         description: "Hubo un error al crear el producto",
@@ -124,16 +148,12 @@ export const FormCreateProduct = ({ product }: Props) => {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader className="space-y-2">
-      
         <CardTitle>{product ? "Editar Producto" : "Crear Producto"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-       
         <Form {...form}>
-          <div>
-          {JSON.stringify(form.formState.errors)}
-          </div>
-       
+          <div>{JSON.stringify(form.formState.errors)}</div>
+
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
@@ -272,7 +292,6 @@ export const FormCreateProduct = ({ product }: Props) => {
                   )}
                 />
 
-            
                 <FormField
                   control={form.control}
                   name={`variants.${index}.price`}
@@ -319,13 +338,23 @@ export const FormCreateProduct = ({ product }: Props) => {
                   )}
                 />
 
-                {/* <Button
-                  type="button"
-    
-                  onClick={() => handleUpdateVariant(index)}
-                >
-                  Editar variante
-                </Button> */}
+                {product ? (
+                  product.variants[index]?.id ? (
+                    <Button
+                      type="button"
+                      onClick={() => handleUpdateVariant(index)}
+                    >
+                      Editar
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => handleCreateVariant(index)}
+                    >
+                      Añadir
+                    </Button>
+                  )
+                ) : null}
 
                 <Button
                   className="bg-red-500 text-white hover:bg-red-600 self-end"

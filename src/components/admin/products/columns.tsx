@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Products } from "@/data/products";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 
 export const columsProducts: ColumnDef<Products>[] = [
   {
@@ -32,10 +34,7 @@ export const columsProducts: ColumnDef<Products>[] = [
     header: "Estado",
     accessorKey: "status",
   },
-  {
-    header: "Acciones",
-    accessorKey: "actions",
-  },
+
   //   {
   //     id: "select",
   //     header: ({ table }) => (
@@ -85,5 +84,36 @@ export const columsProducts: ColumnDef<Products>[] = [
         aria-label="Marcar como popular"
       />
     ),
+  },
+  {
+    id: "actions",
+    header: "",
+    cell: ({ row }) => {
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          
+              <Link
+              className="relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground  cursor-pointer hover:bg-accent hover:text-accent-foreground"
+               href={`/admin/products/edit/${row.original.id}`}>
+                Edit
+              </Link>
+
+         
+            <DropdownMenuItem>View payment details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+
+
   },
 ];

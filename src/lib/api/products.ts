@@ -123,14 +123,9 @@ export const updateVariant = async (variant:{
       }
     );
 
-    console.log(response);
+    return response;
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
+ 
   } catch (error) {
     console.error(error);
     throw error;
@@ -172,3 +167,39 @@ export const updateProduct = async (productData: ProductSchema) => {
   }
 }
 
+
+export const createVariant = async (variant: {
+  attribute: string;
+  value: string;
+  price: number;
+  stock: number;
+  product_id: string;
+}) => {
+
+  const {product_id,...res} =variant
+  try {
+    const session = await getSessionClient();
+
+    if (!session || !session.user?.access_token) {
+      throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/variant/${product_id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+        body: JSON.stringify(res),
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
