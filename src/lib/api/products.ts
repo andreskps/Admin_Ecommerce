@@ -204,3 +204,35 @@ export const createVariant = async (variant: {
     throw error;
   }
 }
+
+export const deleteProduct = async (id: string) => {
+   try {
+       const session = await getSessionClient();
+
+       
+    if (!session || !session.user?.access_token) {
+      throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+      }
+    );
+
+
+    return response
+
+
+       
+   } catch (error) {
+      throw error;
+   }
+
+}
