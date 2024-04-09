@@ -29,6 +29,7 @@ export const getProductsAdmin = async () => {
 };
 
 export const createProduct = async (productData: ProductSchema) => {
+  const {categoryId,...res}=productData;
   try {
     
     const session = await getSessionClient();
@@ -47,7 +48,7 @@ export const createProduct = async (productData: ProductSchema) => {
           Accept: "application/json",
           Authorization: `Bearer ${session.user.access_token}`,
         },
-        body: JSON.stringify(productData),
+        body: JSON.stringify(res),
       }
     );
 
@@ -133,7 +134,7 @@ export const updateVariant = async (variant:{
 };
 
 export const updateProduct = async (productData: ProductSchema) => {
-  const { id,variants, ...rest } = productData;
+  const { id,categoryId,variants, ...rest } = productData;
   try {
     const session = await getSessionClient();
 

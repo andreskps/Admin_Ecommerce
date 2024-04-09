@@ -37,13 +37,31 @@ import { useFieldArray } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 
+type Category = {
+  id: number;
+  name: string;
+  subcategories: SubCategory[];
+};
+
+type SubCategory = {
+  id: number;
+  name: string;
+};
+
 interface Props {
   product?: ProductSchema;
+  categories: Category[];
 }
 
-export const FormCreateProduct = ({ product }: Props) => {
+export const FormCreateProduct = ({ product, categories }: Props) => {
   const { toast } = useToast();
   const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(
+    product?.categoryId ?? null
+  );
+  const [selectedSubCategory, setSelectedSubCategory] = useState<number | null>(
+    product?.subCategoryId ?? null
+  );
 
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
@@ -99,27 +117,26 @@ export const FormCreateProduct = ({ product }: Props) => {
   async function handleCreateVariant(index: number) {
     const variant = form.getValues(`variants.${index}`);
 
-    if (!product) return;
-    const response = await createVariant({
-      ...variant,
-      product_id: product?.id 
-    });
+    // if (!product) return;
+    // const response = await createVariant({
+    //   ...variant,
+    //   product_id: product?.id ?? ""
+    // });
 
-    if (!response.ok) {
-      toast({
-        title: "Error al crear variante",
-        description: "Hubo un error al crear la variante",
-        className: "bg-red-500 text-white",
-      });
-      return;
-    }
+    // if (!response.ok) {
+    //   toast({
+    //     title: "Error al crear variante",
+    //     description: "Hubo un error al crear la variante",
+    //     className: "bg-red-500 text-white",
+    //   });
+    //   return;
+    // }
 
-    toast({
-      title: "Variante creada",
-      description: "La variante se ha creado correctamente",
-      className: "bg-green-500 text-white",
-    });
-
+    // toast({
+    //   title: "Variante creada",
+    //   description: "La variante se ha creado correctamente",
+    //   className: "bg-green-500 text-white",
+    // });
   }
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
@@ -192,29 +209,79 @@ export const FormCreateProduct = ({ product }: Props) => {
 
             <FormField
               control={form.control}
-              name="subCategoryId"
+              name="categoryId"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel className="text-sm" htmlFor="subCategoryId">
+                  <FormLabel className="text-sm" htmlFor="categoryId">
                     Categoria
                   </FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={(value) => {
-                        form.setValue("subCategoryId", parseInt(value));
+                        const selectedValue = parseInt(value);
+                        setSelectedCategory(selectedValue);
+                        form.setValue("categoryId", selectedValue);
                       }}
-                      // defaultValue={product?.subCategoryId.toString()}
+                      defaultValue={selectedCategory?.toString()}
                     >
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Seleccione categoria" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectLabel>Fruits</SelectLabel>
-                          <SelectItem value="1">Apple</SelectItem>
-                          <SelectItem value="2">Banana</SelectItem>
-                          <SelectItem value="3">Blueberry</SelectItem>
-                          <SelectItem value="4">Grapes</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem
+                              key={category.id}
+                              value={category.id.toString()}
+                            >
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="subCategoryId"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="subCategoryId">
+                    Subcategoria
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        const selectedValue = parseInt(value);
+                        setSelectedSubCategory(selectedValue);
+                        form.setValue("subCategoryId", selectedValue);
+                      }}
+                      defaultValue={selectedSubCategory?.toString()}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleccione subcategoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {selectedCategory
+                            ? categories
+                                .find(
+                                  (category) => category.id === selectedCategory
+                                )
+                                ?.subcategories?.map((subCategory) => (
+                                  <SelectItem
+                                    key={subCategory.id}
+                                    value={subCategory.id.toString()}
+                                  >
+                                    {subCategory.name}
+                                  </SelectItem>
+                                ))
+                            : null}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
