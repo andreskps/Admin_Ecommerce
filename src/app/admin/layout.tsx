@@ -13,31 +13,21 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const session = await getServerSession(authOptions);
-
-  
 
   // if (!session) {
   //   return <div>loading...</div>;
   // }
 
-
-
   return (
-
-     
-  
     <>
-   
+      {/* <Sidebar /> */}
+     
+      <div className="flex h-screen ">
+      <Sidebar />
 
-      
-        {/* <Sidebar /> */}
-        <Sidebar />
-        
-  
-        <div className="w-full pt-10 px-4 sm:px-6 md:px-8 lg:ps-72">{children}</div>
-      
+      <main className="w-full pt-16">{children}</main>
+      </div>
     </>
   );
 }

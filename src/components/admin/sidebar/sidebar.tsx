@@ -68,7 +68,7 @@ const menuItems: MenuItem[] = [
 
 export function Sidebar() {
   return (
-    <div>
+    <div  className="relative hidden h-screen border-r pt-16 lg:block w-72">
       <div className=" duration-300 transform  fixed top-0 start-0 bottom-0  w-64 bg-white border-e border-gray-200 pt-7 pb-10 overflow-y-auto lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:bg-gray-800 dark:border-gray-700">
         <div className="flex h-[60px] items-center px-6">
           <Link className="flex items-center gap-2 font-semibold" href="#">
