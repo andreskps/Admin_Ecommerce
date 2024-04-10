@@ -18,7 +18,7 @@ import {useState} from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { createBrand } from "@/lib/api/brands";
+import { createBrand, updateBrand } from "@/lib/api/brands";
 
 interface Props {
   brand?: z.infer<typeof brandSchema>;
@@ -38,22 +38,22 @@ export const FormBrand = ({ brand }: Props) => {
 
  async  function onSubmit(values: z.infer<typeof brandSchema>) {
 
-    if (brand) {
-      // Edit brand
-      console.log("Edit brand", values);
-      return;
-    }
-
+    
     // Create brand
     try {
-      const res = await createBrand(values);
+      const res = brand ? await updateBrand(values) : await createBrand(values);
+
       console.log(await res.json());
-      if (res.ok) {
-        alert("Marca creada correctamente");
-        form.reset();
-      } else {
-        alert("Ocurrió un error al crear la marca");
+
+      if (!res.ok) {
+          alert("Ocurrió un error al crear la marca");
+          return;
       }
+
+      alert("Marca creada con éxito");
+
+
+    
     } catch (error) {
       alert("Ocurrió un error al crear la marca");
 
