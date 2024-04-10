@@ -43,6 +43,10 @@ const menuItems: MenuItem[] = [
         title: "Categorias",
         path: "/categorias",
       },
+      {
+        title: "Marcas",
+        path: "/admin/brands",
+      },
     ],
   },
   {
@@ -76,12 +80,11 @@ export function Sidebar() {
           <nav className="flex flex-col gap-1 px-4 text-sm font-medium">
             {menuItems.map((item) => (
               <>
-                <SidebarItem {...item
-            
-                } />
+                <SidebarItem 
+                key={item.title}
+                {...item} />
               </>
             ))}
-        
           </nav>
         </div>
       </div>
