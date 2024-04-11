@@ -9,28 +9,16 @@ import { SeparatorHorizontal, SeparatorVertical } from "lucide-react";
 const breadcrumbItems = [{ title: "Marcas", link: "/admin/brands" }];
 export default async function BrandPage() {
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`,{
+    method: 'GET'
+    ,cache: 'no-cache'
+  });
 
   const brands = await response.json();
 
+  console.log(brands);
   
-  // const brands = [
-  //   {
-  //     id: 1,
-  //     name: "Nike",
-  //     description: "Nike description",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Adidas",
-  //     description: "Adidas description",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Puma",
-  //     description: "Puma description",
-  //   },
-  // ];
+  
   return (
     <div className="flex-1 space-y-4  p-4 md:p-8 pt-6">
       <div className="flex items-start justify-between">

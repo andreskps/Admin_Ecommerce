@@ -20,14 +20,16 @@ export default async function EditBrandPage({params}: Props) {
         cache: "no-cache",
     })
     
+
+    if (!response.ok) {
+        return <div>Brand not found</div>;
+    }
+
+
     const brand = await response.json();
 
 
-    // const brand = {
-    //     id: 1,
-    //     name: "Brand 1",
-    //     description: "Description 1"
-    // }
+  
   return (
       
     <FormBrand brand={brand} />

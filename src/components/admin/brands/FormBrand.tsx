@@ -13,21 +13,22 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { brandSchema } from "@/validations/brandSchema";
 import { z } from "zod";
-
-import {useState} from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createBrand, updateBrand } from "@/lib/api/brands";
+import { revalidateTag } from "next/cache";
 
 interface Props {
   brand?: z.infer<typeof brandSchema>;
 }
 
 export const FormBrand = ({ brand }: Props) => {
-
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof brandSchema>>({
     resolver: zodResolver(brandSchema),
@@ -36,9 +37,7 @@ export const FormBrand = ({ brand }: Props) => {
     },
   });
 
- async  function onSubmit(values: z.infer<typeof brandSchema>) {
-
-    
+  async function onSubmit(values: z.infer<typeof brandSchema>) {
     // Create brand
     try {
       const res = brand ? await updateBrand(values) : await createBrand(values);
@@ -46,18 +45,17 @@ export const FormBrand = ({ brand }: Props) => {
       console.log(await res.json());
 
       if (!res.ok) {
-          alert("Ocurrió un error al crear la marca");
-          return;
+        alert("Ocurrió un error al crear la marca");
+        return;
       }
 
       alert("Marca creada con éxito");
 
+      router.push("/admin/brands");
 
-    
     } catch (error) {
+      console.log(error)
       alert("Ocurrió un error al crear la marca");
-
-
     }
   }
 
