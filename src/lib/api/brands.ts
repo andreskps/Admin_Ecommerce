@@ -49,3 +49,24 @@ export const updateBrand = async (brand: Brand) => {
     return response
 
 }
+
+export const deleteBrand = async (id: string) => {
+    
+    const session = await getSessionClient();
+
+    if (!session || !session.user?.access_token) {
+        throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brands/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${session.user.access_token}`,
+        }
+    });
+
+    return response
+
+}
