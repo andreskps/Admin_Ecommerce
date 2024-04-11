@@ -12,17 +12,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { petSchema } from "@/validations/petSchema";
 import { z } from "zod";
+import { createPet, updatePet } from "@/lib/api/pets";
 
 interface Props {
   pet?: z.infer<typeof petSchema>;
 }
 
 export const FormPet = ({ pet }: Props) => {
+
+  const router = useRouter();
+
+
   const form = useForm<z.infer<typeof petSchema>>({
     resolver: zodResolver(petSchema),
     defaultValues: {
@@ -31,9 +36,25 @@ export const FormPet = ({ pet }: Props) => {
   });
 
   async function onSubmit(values: z.infer<typeof petSchema>) {
+    try {
+      const res = pet
+        ? await updatePet(pet.id, values)
+        : await createPet(values);
 
+      console.log(await res.json());
 
-    
+      if (!res.ok) {
+        alert("Ocurrió un error al crear la mascota");
+        return;
+      }
+
+      alert("Mascota creada con éxito");
+
+      router.push("/admin/pets");
+    } catch (error) {
+      console.log(error);
+      alert("Ocurrió un error al crear la mascota");
+    }
   }
 
   return (
@@ -59,7 +80,7 @@ export const FormPet = ({ pet }: Props) => {
                 </FormItem>
               )}
             />
-             <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full">
               {pet ? "Editar mascota" : "Crear mascota"}
             </Button>
           </form>

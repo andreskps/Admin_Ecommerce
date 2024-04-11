@@ -1,8 +1,17 @@
+import { Heading } from "@/components/ui/heading";
 
 export default function PetsPage() {
   return (
-    <div>
-      <h1>Hello Page</h1>
+    <div className="flex-1 space-y-4  p-4 md:p-8 pt-6">
+    <div className="flex items-start justify-between">
+      <Heading
+        title="Mascotas"
+        description="Manage users (Client side table functionalities.)"
+        link="/admin/pets/create"
+      />
     </div>
+
+    {/* <DataTable columns={columsBrands} searchKey="name" data={brands} /> */}
+  </div>
   );
 }
