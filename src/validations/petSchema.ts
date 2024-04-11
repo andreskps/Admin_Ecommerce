@@ -5,4 +5,4 @@ export const petSchema = z.object({
     name: z.string().min(2, "El nombre no puede tener menos de 2 caracteres"),
 });
 
-export type Pet = z.infer<typeof brandSchema>;
+export type Pet = z.infer<typeof petSchema>;

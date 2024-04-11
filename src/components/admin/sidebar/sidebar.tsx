@@ -47,6 +47,10 @@ const menuItems: MenuItem[] = [
         title: "Marcas",
         path: "/admin/brands",
       },
+      {
+        title: "Mascotas",
+        path: "/admin/pets",
+      }
     ],
   },
   {

@@ -1,8 +1,8 @@
+import { FormPet } from "@/components/admin/pets/FormPet";
 
 export default function EditPetPage() {
-  return (
-    <div>
-      <h1>Hello Page</h1>
-    </div>
-  );
+  const pet = {
+    name: "Perrito",
+  };
+  return <FormPet pet={pet} />;
 }
