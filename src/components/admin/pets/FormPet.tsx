@@ -24,9 +24,7 @@ interface Props {
 }
 
 export const FormPet = ({ pet }: Props) => {
-
   const router = useRouter();
-
 
   const form = useForm<z.infer<typeof petSchema>>({
     resolver: zodResolver(petSchema),
@@ -37,9 +35,7 @@ export const FormPet = ({ pet }: Props) => {
 
   async function onSubmit(values: z.infer<typeof petSchema>) {
     try {
-      const res = pet
-        ? await updatePet(pet.id, values)
-        : await createPet(values);
+      const res = pet ? await updatePet(values) : await createPet(values);
 
       console.log(await res.json());
 

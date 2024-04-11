@@ -25,7 +25,9 @@ export const createPet = async (pet: Pet) => {
     return response
 }
 
-export const updatePet = async (id:number,pet:Pet) => {
+export const updatePet = async (pet:Pet) => {
+
+    const {id,...res} = pet
     
     const session = await getSessionClient();
 
@@ -40,7 +42,7 @@ export const updatePet = async (id:number,pet:Pet) => {
             Accept: "application/json",
             Authorization: `Bearer ${session.user.access_token}`,
         },
-        body: JSON.stringify(pet)
+        body: JSON.stringify(res)
     });
 
     return response
