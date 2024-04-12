@@ -41,7 +41,7 @@ const menuItems: MenuItem[] = [
       },
       {
         title: "Categorias",
-        path: "/categorias",
+        path: "/admin/categories",
       },
       {
         title: "Marcas",
