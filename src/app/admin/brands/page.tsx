@@ -15,8 +15,6 @@ export default async function BrandPage() {
   });
 
   const brands = await response.json();
-
-  console.log(brands);
   
   
   return (
