@@ -1,8 +1,35 @@
+import { FormCategories } from "@/components/admin/categories/FormCategories";
 
-export default function EditCategoryPage() {
+
+
+interface Props {
+  params: {
+    id: string;
+  };
+}
+
+
+export default function EditCategoryPage({params}:Props) {
+
+
+  const category = {
+    id: 1,
+    name: "Category",
+    subcategories: [
+      {
+        id: 1,
+        name: "Subcategory 1",
+      },
+      {
+        id: 2,
+        name: "Subcategory 2",
+      },
+    ],
+  };
+
+
+
   return (
-    <div>
-      <h1>Hello Page</h1>
-    </div>
+      <FormCategories  category={category}/>
   );
 }

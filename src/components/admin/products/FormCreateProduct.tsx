@@ -147,7 +147,7 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
 
       toast({
         title: "Producto creado",
-        description: "El producto se ha creado correctamente",
+          description: "El producto se ha creado correctamente",
 
         className: "bg-green-500 text-white",
       });
