@@ -19,5 +19,6 @@ export default async function EditCategoryPage({ params }: Props) {
 
   const category = await response.json();
 
+
   return <FormCategories category={category} />;
 }

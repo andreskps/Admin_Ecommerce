@@ -23,7 +23,11 @@ export const createCategory = async (category: Category) => {
     return response
 }
 
-export const updateCategory = async (category:Category) => {
+export const updateCategory = async (category:{
+    id: number;
+    name: string;
+
+}) => {
 
     const {id,...res} = category
     

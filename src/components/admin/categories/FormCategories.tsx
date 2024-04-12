@@ -19,7 +19,7 @@ import { z } from "zod";
 import { useFieldArray } from "react-hook-form";
 import { createCategory, updateCategory } from "@/lib/api/categories";
 import { useRouter } from "next/navigation";
-import { createSubcategory } from "../../../lib/api/subcategories";
+import { createSubcategory, updateSubcategory } from "../../../lib/api/subcategories";
 
 interface Props {
   category?: z.infer<typeof categorySchema>;
@@ -68,11 +68,40 @@ export const FormCategories = ({ category }: Props) => {
     });
   }
 
+  async function handleUpdateSubCategory(index: number) {
+    const subCategory = form.getValues(`subcategories.${index}`);
+
+    console.log(subCategory);
+
+    const response = await updateSubcategory({
+      id: subCategory.id,
+      name: subCategory.name,
+    });
+
+    if (!response.ok) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al crear la subcategoria",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    toast({
+      title: "Subcategoria creada",
+      description: "La subcategoria se ha creado correctamente",
+      className: "bg-green-500 text-white",
+    });
+  }
+
   async function onSubmit(values: z.infer<typeof categorySchema>) {
     try {
-      console.log(values);
+     
       const response = category
-        ? await updateCategory(values)
+        ? await updateCategory({
+            id: category.id ?? 0,
+            name: values.name,
+          })
         : await createCategory(values);
 
       if (!response.ok) {
@@ -150,7 +179,7 @@ export const FormCategories = ({ category }: Props) => {
                   category.subcategories[index]?.id ? (
                     <Button
                       type="button"
-                      // onClick={() => handleUpdateVariant(index)}
+                      onClick={() => handleUpdateSubCategory(index)}
                     >
                       Editar
                     </Button>
