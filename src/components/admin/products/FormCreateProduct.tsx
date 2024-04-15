@@ -48,12 +48,28 @@ type SubCategory = {
   name: string;
 };
 
+type Brands = {
+  id: number;
+  name: string;
+};
+
+type Pets = {
+  id: number;
+  name: string;
+};
 interface Props {
   product?: ProductSchema;
   categories: Category[];
+  brands?: Brands[];
+  pets?: Pets[];
 }
 
-export const FormCreateProduct = ({ product, categories }: Props) => {
+export const FormCreateProduct = ({
+  product,
+  categories,
+  brands,
+  pets,
+}: Props) => {
   const { toast } = useToast();
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
@@ -75,7 +91,6 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
     name: "variants",
   });
 
-  // form.watch("variants");
   const añadirVariante = () => {
     append({
       attribute: "",
@@ -117,26 +132,50 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
   async function handleCreateVariant(index: number) {
     const variant = form.getValues(`variants.${index}`);
 
-    // if (!product) return;
-    // const response = await createVariant({
-    //   ...variant,
-    //   product_id: product?.id ?? ""
-    // });
+    if (
+      !product ||
+      !variant?.attribute ||
+      !variant?.value ||
+      !variant?.price ||
+      !variant?.stock
+    )
+      return;
 
-    // if (!response.ok) {
-    //   toast({
-    //     title: "Error al crear variante",
-    //     description: "Hubo un error al crear la variante",
-    //     className: "bg-red-500 text-white",
-    //   });
-    //   return;
-    // }
+    const response = await createVariant({
+      ...variant,
+      product_id: product?.id ?? "",
+    })
 
-    // toast({
-    //   title: "Variante creada",
-    //   description: "La variante se ha creado correctamente",
-    //   className: "bg-green-500 text-white",
-    // });
+    if (!response.ok) {
+      toast({
+        title: "Error al crear variante",
+        description: "Hubo un error al crear la variante",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    toast({
+      title: "Variante creada",
+      description: "La variante se ha creado correctamente",
+      className: "bg-green-500 text-white",
+    });
+  }
+
+  async function handleDeleteVariant(index: number) {
+    if (!product) {
+      return remove(index);
+    }
+
+    const variant = form.getValues(`variants.${index}`);
+
+    if (!variant) return;
+
+    if (!variant.id) {
+      return remove(index);
+    }
+
+    console.log("delete variant", variant.id);
   }
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
@@ -147,7 +186,7 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
 
       toast({
         title: "Producto creado",
-          description: "El producto se ha creado correctamente",
+        description: "El producto se ha creado correctamente",
 
         className: "bg-green-500 text-white",
       });
@@ -169,8 +208,6 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <Form {...form}>
-          {/* <div>{JSON.stringify(form.formState.errors)}</div> */}
-
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
@@ -282,6 +319,77 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
                                   </SelectItem>
                                 ))
                             : null}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="brandId"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="brandId">
+                    Marca
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        form.setValue("brandId", parseInt(value));
+                      }}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleccione marca" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {brands?.map((brand) => (
+                            <SelectItem
+                              key={brand.id}
+                              value={brand.id.toString()}
+                            >
+                              {brand.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="petId"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="petId">
+                    Tipo Mascota
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        form.setValue("petId", parseInt(value));
+                      }}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleccione mascota" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {pets?.map((pet) => (
+                            <SelectItem key={pet.id} value={pet.id.toString()}>
+                              {pet.name}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -424,8 +532,9 @@ export const FormCreateProduct = ({ product, categories }: Props) => {
                 ) : null}
 
                 <Button
+                  type="button"
                   className="bg-red-500 text-white hover:bg-red-600 self-end"
-                  onClick={() => remove(index)}
+                  onClick={() => handleDeleteVariant(index)}
                 >
                   Eliminar
                 </Button>

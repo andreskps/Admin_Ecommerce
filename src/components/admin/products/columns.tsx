@@ -65,36 +65,36 @@ export const columsProducts: ColumnDef<Products>[] = [
   //       />
   //     ),
   //   },
-  {
-    id: "isPopular",
-    header: "Popular",
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.original.isPopular}
-        onCheckedChange={(value) => {
-          // Aquí puedes manejar el cambio de estado del checkbox.
-          // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
-          console.log(`Producto ${row.original.id} popular: ${value}`);
-        }}
-        aria-label="Marcar como popular"
-      />
-    ),
-  },
-  {
-    id: "isActive",
-    header: "Activo",
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.original.isActive}
-        onCheckedChange={(value) => {
-          // Aquí puedes manejar el cambio de estado del checkbox.
-          // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
-          console.log(`Producto ${row.original.id} activo: ${value}`);
-        }}
-        aria-label="Marcar como popular"
-      />
-    ),
-  },
+  // {
+  //   id: "isPopular",
+  //   header: "Popular",
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.original.isPopular}
+  //       onCheckedChange={(value) => {
+  //         // Aquí puedes manejar el cambio de estado del checkbox.
+  //         // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
+  //         console.log(`Producto ${row.original.id} popular: ${value}`);
+  //       }}
+  //       aria-label="Marcar como popular"
+  //     />
+  //   ),
+  // },
+  // {
+  //   id: "isActive",
+  //   header: "Activo",
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.original.isActive}
+  //       onCheckedChange={(value) => {
+  //         // Aquí puedes manejar el cambio de estado del checkbox.
+  //         // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
+  //         console.log(`Producto ${row.original.id} activo: ${value}`);
+  //       }}
+  //       aria-label="Marcar como popular"
+  //     />
+  //   ),
+  // },
   {
     id: "actions",
     header: "",
