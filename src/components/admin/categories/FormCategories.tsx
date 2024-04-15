@@ -19,7 +19,11 @@ import { z } from "zod";
 import { useFieldArray } from "react-hook-form";
 import { createCategory, updateCategory } from "@/lib/api/categories";
 import { useRouter } from "next/navigation";
-import { createSubcategory, updateSubcategory } from "../../../lib/api/subcategories";
+import {
+  createSubcategory,
+  updateSubcategory,
+  deleteSubcategory,
+} from "../../../lib/api/subcategories";
 
 interface Props {
   category?: z.infer<typeof categorySchema>;
@@ -94,9 +98,33 @@ export const FormCategories = ({ category }: Props) => {
     });
   }
 
+  async function handleDeleteSubCategory(index: number) {
+    const subCategory = form.getValues(`subcategories.${index}`);
+
+    if (!subCategory.id) {
+      remove(index);
+      return;
+    }
+
+    const response = await deleteSubcategory(subCategory.id);
+
+
+    if (!response.ok) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al eliminar la subcategoria",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    remove(index);
+
+
+  }
+
   async function onSubmit(values: z.infer<typeof categorySchema>) {
     try {
-     
       const response = category
         ? await updateCategory({
             id: category.id ?? 0,
@@ -193,7 +221,10 @@ export const FormCategories = ({ category }: Props) => {
                   )
                 ) : null}
 
-                <Button type="button" onClick={() => remove(index)}>
+                <Button
+                  type="button"
+                  onClick={() => handleDeleteSubCategory(index)}
+                >
                   Eliminar
                 </Button>
               </div>
