@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+export const ImgSchema = z.object({
+    id: z.string().optional(),
+    url: z.string().optional(),
+});
 export const productSchema = z.object({
     id: z.string().optional(),
     title: z.string().min(2, "El titulo no puede tener mas de 255 caracteres"),
@@ -8,6 +12,7 @@ export const productSchema = z.object({
     categoryId: z.number(),
     brandId: z.number().optional(),
     petId: z.number(),
+    images: z.array(ImgSchema).optional(),
     variants: z.array(
         z.object({
             id: z.number().optional(),
@@ -19,5 +24,11 @@ export const productSchema = z.object({
         }).optional()
     ),
 });
+
+
+
+
+
+
 
 export type ProductSchema = z.infer<typeof productSchema>;

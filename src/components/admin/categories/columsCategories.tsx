@@ -4,7 +4,7 @@ import { Category } from "@/validations/categoySchema";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 import { CellAction } from "../products/cellAction";
-import { deletePet } from "@/lib/api/pets";
+import { deleteCategory } from "@/lib/api/categories";
 
 export const columsCategories: ColumnDef<Category>[] = [
   {
@@ -23,7 +23,7 @@ export const columsCategories: ColumnDef<Category>[] = [
         key={row.original.id}
         link="/admin/categories/edit"
         id={row.original?.id?.toString() || ""}
-        onDeleted={deletePet}
+        onDeleted={deleteCategory}
       />
     ),
   }

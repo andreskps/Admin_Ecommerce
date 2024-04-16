@@ -49,3 +49,23 @@ export const updateCategory = async (category:{
 
     return response
 }
+
+export const deleteCategory = async (id: string) => {
+
+    const session = await getSessionClient();
+
+    if (!session || !session.user?.access_token) {
+        throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${session.user.access_token}`,
+        }
+    });
+
+    return response
+}

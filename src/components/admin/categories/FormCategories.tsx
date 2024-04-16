@@ -108,7 +108,6 @@ export const FormCategories = ({ category }: Props) => {
 
     const response = await deleteSubcategory(subCategory.id);
 
-
     if (!response.ok) {
       toast({
         title: "Error",
@@ -119,8 +118,6 @@ export const FormCategories = ({ category }: Props) => {
     }
 
     remove(index);
-
-
   }
 
   async function onSubmit(values: z.infer<typeof categorySchema>) {
@@ -147,6 +144,7 @@ export const FormCategories = ({ category }: Props) => {
         className: "bg-green-500 text-white",
       });
 
+      router.refresh();
       router.push("/admin/categories");
     } catch (error) {
       toast({

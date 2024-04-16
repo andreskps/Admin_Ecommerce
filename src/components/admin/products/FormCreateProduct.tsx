@@ -30,12 +30,15 @@ import { useState } from "react";
 import {
   createProduct,
   createVariant,
+  deleteVariant,
   updateProduct,
   updateVariant,
+  uploadImages,
 } from "@/lib/api/products";
 import { useFieldArray } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { FilesUpload } from "@/components/ui/files-upload";
 
 type Category = {
   id: number;
@@ -79,12 +82,20 @@ export const FormCreateProduct = ({
     product?.subCategoryId ?? null
   );
 
+  const [files, setFiles] = useState<File[]>([]);
+
+  const onUpload = (files: File[]) => {
+    setFiles(files);
+  };
+
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       ...product,
     },
   });
+
+  const [productImages, setProductImages] = useState<FileList | null>(null);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -143,8 +154,8 @@ export const FormCreateProduct = ({
 
     const response = await createVariant({
       ...variant,
-      product_id: product?.id ?? "",
-    })
+      productId: product?.id ?? "",
+    });
 
     if (!response.ok) {
       toast({
@@ -175,11 +186,32 @@ export const FormCreateProduct = ({
       return remove(index);
     }
 
-    console.log("delete variant", variant.id);
+    const response = await deleteVariant(variant.id.toString());
+
+    if (!response.ok) {
+      toast({
+        title: "Error al eliminar variante",
+        description: "Hubo un error al eliminar la variante",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    remove(index);
+
+    toast({
+      title: "Variante eliminada",
+      description: "La variante se ha eliminado correctamente",
+      className: "bg-green-500 text-white",
+    });
   }
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
+      const urls = await uploadImages(files);
+
+      values.images = urls;
+
       values.id ? await updateProduct(values) : await createProduct(values);
 
       form.reset();
@@ -209,6 +241,26 @@ export const FormCreateProduct = ({
       <CardContent className="space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Images</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    onChange={field.onChange}
+                    value={field.value}
+                    onRemove={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
+
+            <FilesUpload onUpload={onUpload} initialFiles={files} />
+
             <FormField
               control={form.control}
               name="title"
