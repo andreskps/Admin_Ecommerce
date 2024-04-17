@@ -126,6 +126,7 @@ export const updateVariant = async (variant: {
 
 export const updateProduct = async (productData: ProductSchema) => {
   const { id, categoryId, variants, ...rest } = productData;
+
   try {
     const session = await getSessionClient();
 
@@ -146,12 +147,8 @@ export const updateProduct = async (productData: ProductSchema) => {
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
+    return response;
 
-    const data = await response.json();
-    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -273,8 +270,40 @@ export const uploadImages = async (files: File[]) => {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
 
+
     const data = await response.json();
+
     return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export const deleteImage = async (id: number) => {
+  try {
+    const session = await getSessionClient();
+
+    if (!session || !session.user?.access_token) {
+      throw new Error("No se pudo obtener la sesión o el token de acceso.");
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/delete-image/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.user.access_token}`,
+        },
+      }
+    );
+ 
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response;
   } catch (error) {
     console.error(error);
     throw error;

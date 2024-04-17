@@ -53,6 +53,5 @@ export default async function EditProductPage({ params }: Props) {
   const product = await responseProduct.json();
 
 
-
   return <FormCreateProduct product={product}  categories={categories} brands={brands} pets={pets}/>;
 }

@@ -39,6 +39,7 @@ import { useFieldArray } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { FilesUpload } from "@/components/ui/files-upload";
+import CardImages from "./CardImages";
 
 type Category = {
   id: number;
@@ -61,7 +62,23 @@ type Pets = {
   name: string;
 };
 interface Props {
-  product?: ProductSchema;
+  product?: {
+    id: string;
+    title: string;
+    description: string;
+    categoryId: number;
+    subCategoryId: number;
+    brandId: number;
+    petId: number;
+    images: { id: number; url: string }[];
+    variants: {
+      id: number;
+      attribute: string;
+      value: string;
+      price: number;
+      stock: number;
+    }[];
+  };
   categories: Category[];
   brands?: Brands[];
   pets?: Pets[];
@@ -92,10 +109,9 @@ export const FormCreateProduct = ({
     resolver: zodResolver(productSchema),
     defaultValues: {
       ...product,
+      images: []
     },
   });
-
-  const [productImages, setProductImages] = useState<FileList | null>(null);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -166,6 +182,7 @@ export const FormCreateProduct = ({
       return;
     }
 
+    router.refresh();
     toast({
       title: "Variante creada",
       description: "La variante se ha creado correctamente",
@@ -208,30 +225,46 @@ export const FormCreateProduct = ({
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
-      const urls = await uploadImages(files);
+      
+      if(files.length > 0){
+        const urls:string[] = await uploadImages(files);
+        values.images = urls;
+      }
 
-      values.images = urls;
+  
+      const response = product
+        ? await updateProduct({ ...values  })
+        : await createProduct({ ...values  });
 
-      values.id ? await updateProduct(values) : await createProduct(values);
+    
+      if (!response.ok) {
+        return showErrorToast("Error al crear producto", "Hubo un error al crear el producto");
+      }
+  
 
-      form.reset();
+      showSuccessToast("Producto creado", "El producto se ha creado correctamente");
 
-      toast({
-        title: "Producto creado",
-        description: "El producto se ha creado correctamente",
-
-        className: "bg-green-500 text-white",
-      });
-
+      router.refresh();
       router.push("/admin/products");
     } catch (error) {
-      toast({
-        title: "Error al crear producto",
-        description: "Hubo un error al crear el producto",
-        className: "bg-red-500 text-white",
-      });
-      return;
+      showErrorToast("Error al crear producto", "Hubo un error al crear el producto");
     }
+  }
+  
+  function showErrorToast(title: string, description: string) {
+    toast({
+      title,
+      description,
+      className: "bg-red-500 text-white",
+    });
+  }
+  
+  function showSuccessToast(title: string, description: string) {
+    toast({
+      title,
+      description,
+      className: "bg-green-500 text-white",
+    });
   }
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -241,25 +274,10 @@ export const FormCreateProduct = ({
       <CardContent className="space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* <FormField
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Images</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
-
+            {JSON.stringify(form.formState.errors)}
             <FilesUpload onUpload={onUpload} initialFiles={files} />
+
+            {product ? <CardImages images={product.images} /> : null}
 
             <FormField
               control={form.control}
