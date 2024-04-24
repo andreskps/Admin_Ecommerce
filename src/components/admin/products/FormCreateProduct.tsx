@@ -109,7 +109,7 @@ export const FormCreateProduct = ({
     resolver: zodResolver(productSchema),
     defaultValues: {
       ...product,
-      images: []
+      images: [],
     },
   });
 
@@ -225,32 +225,38 @@ export const FormCreateProduct = ({
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
-      
-      if(files.length > 0){
-        const urls:string[] = await uploadImages(files);
+      if (files.length > 0) {
+        const urls: string[] = await uploadImages(files);
         values.images = urls;
       }
 
-  
       const response = product
-        ? await updateProduct({ ...values  })
-        : await createProduct({ ...values  });
+        ? await updateProduct({ ...values })
+        : await createProduct({ ...values });
 
-    
       if (!response.ok) {
-        return showErrorToast("Error al crear producto", "Hubo un error al crear el producto");
+        return showErrorToast(
+          "Error al crear producto",
+          "Hubo un error al crear el producto"
+        );
       }
-  
 
-      showSuccessToast("Producto creado", "El producto se ha creado correctamente");
+      showSuccessToast(
+        `Producto ${product ? "actualizado" : "creado"}`,
+        `El producto se ha ${product ? "actualizado" : "creado"} correctamente`
+      );
 
       router.refresh();
       router.push("/admin/products");
+  
     } catch (error) {
-      showErrorToast("Error al crear producto", "Hubo un error al crear el producto");
+      showErrorToast(
+        "Error al crear producto",
+        "Hubo un error al crear el producto"
+      );
     }
   }
-  
+
   function showErrorToast(title: string, description: string) {
     toast({
       title,
@@ -258,7 +264,7 @@ export const FormCreateProduct = ({
       className: "bg-red-500 text-white",
     });
   }
-  
+
   function showSuccessToast(title: string, description: string) {
     toast({
       title,
@@ -274,7 +280,7 @@ export const FormCreateProduct = ({
       <CardContent className="space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {JSON.stringify(form.formState.errors)}
+            {/* {JSON.stringify(form.formState.errors)} */}
             <FilesUpload onUpload={onUpload} initialFiles={files} />
 
             {product ? <CardImages images={product.images} /> : null}
@@ -474,25 +480,6 @@ export const FormCreateProduct = ({
             </Button>
             {fields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
-                {/* <div className="flex flex-col">
-                  <Label className="text-gray-700">Atributo</Label>
-                  <Select
-                    onValueChange={(value) => {
-                      form.setValue(`variants.${index}.attribute`, value);
-                    }}
-                    defaultValue={field.attribute}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Atributo" />
-                    </SelectTrigger>
-                    <SelectContent className="w-[180px]">
-                      <SelectGroup>
-                        <SelectItem value="color">Color</SelectItem>
-                        <SelectItem value="size">Tamaño</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div> */}
                 <FormField
                   control={form.control}
                   name={`variants.${index}.attribute`}
@@ -583,31 +570,33 @@ export const FormCreateProduct = ({
                   )}
                 />
 
-                {product ? (
-                  product.variants[index]?.id ? (
-                    <Button
-                      type="button"
-                      onClick={() => handleUpdateVariant(index)}
-                    >
-                      Editar
-                    </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={() => handleCreateVariant(index)}
-                    >
-                      Añadir
-                    </Button>
-                  )
-                ) : null}
+                <div className="flex self-end gap-2">
+                  {product ? (
+                    product.variants[index]?.id ? (
+                      <Button
+                        type="button"
+                        onClick={() => handleUpdateVariant(index)}
+                      >
+                        Editar
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={() => handleCreateVariant(index)}
+                      >
+                        Añadir
+                      </Button>
+                    )
+                  ) : null}
 
-                <Button
-                  type="button"
-                  className="bg-red-500 text-white hover:bg-red-600 self-end"
-                  onClick={() => handleDeleteVariant(index)}
-                >
-                  Eliminar
-                </Button>
+                  <Button
+                    type="button"
+                    className="bg-red-500 text-white hover:bg-red-600  "
+                    onClick={() => handleDeleteVariant(index)}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
               </div>
             ))}
 

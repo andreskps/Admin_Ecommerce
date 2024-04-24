@@ -4,14 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
-
-
 interface Props {
-  images:  {
-    id:number
+  images: {
+    id: number;
     url: string;
   }[];
-  
 }
 
 const CardImages = ({ images }: Props) => {
@@ -20,6 +17,23 @@ const CardImages = ({ images }: Props) => {
   const { toast } = useToast();
 
   const handleDelete = async (id: number) => {
+    if (images.length === 1) {
+      toast({
+        title: "No se puede eliminar",
+        description: "No se puede eliminar la única imagen del producto",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    const confirmation = window.confirm(
+      "¿Estás seguro de que quieres eliminar esta imagen?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
     const response = await deleteImage(id);
 
     if (response.ok) {

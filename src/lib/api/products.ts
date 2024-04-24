@@ -50,12 +50,8 @@ export const createProduct = async (productData: ProductSchema) => {
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
+    
+    return response;
   } catch (error) {
     console.error(error);
     throw error;

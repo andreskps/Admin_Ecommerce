@@ -52,6 +52,7 @@ export const FormBrand = ({ brand }: Props) => {
 
       alert("Marca creada con éxito");
 
+      router.refresh();
       router.push("/admin/brands");
 
     } catch (error) {

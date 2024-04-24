@@ -3,7 +3,10 @@ const nextConfig = {
 //     experimental: {
 //         staticGenerationStore: true,
 //       },
+ 
 // };
+
+
 }
 
 export default nextConfig;

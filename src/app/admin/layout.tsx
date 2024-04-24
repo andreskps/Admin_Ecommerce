@@ -7,14 +7,12 @@ export const metadata: Metadata = {
 };
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-
   // if (!session) {
   //   return <div>loading...</div>;
   // }
@@ -22,11 +20,11 @@ export default async function AdminLayout({
   return (
     <>
       {/* <Sidebar /> */}
-     
-      <div className="flex h-screen ">
-      <Sidebar />
 
-      <main className="w-full pt-16">{children}</main>
+      <div className="flex h-screen ">
+        <Sidebar />
+
+        <main className="w-full pt-16">{children}</main>
       </div>
     </>
   );

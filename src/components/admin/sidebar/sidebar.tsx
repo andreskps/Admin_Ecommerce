@@ -7,6 +7,9 @@ import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 import { AiOutlineBarChart } from "react-icons/ai";
 import { SidebarItem } from "./SidebarItem";
+import { FaBoxes } from "react-icons/fa";
+import { FiUsers } from "react-icons/fi";
+import { FiDollarSign } from "react-icons/fi";
 
 interface SubMenuItem {
   title: string;
@@ -33,7 +36,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "Productos",
-    icon: <AiOutlineBarChart />,
+    icon: <FaBoxes />,
     subLinks: [
       {
         title: "Lista de Productos",
@@ -55,7 +58,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "Ventas",
-    icon: <AiOutlineBarChart />,
+    icon: <FiDollarSign />,
     subLinks: [
       {
         title: "Lista de Ventas",
@@ -65,7 +68,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "Clientes",
-    icon: <AiOutlineBarChart />,
+    icon: <FiUsers />,
     path: "/clientes",
   },
 ];
@@ -81,7 +84,7 @@ export function Sidebar() {
           </Link>
         </div>
         <div className="flex-1 overflow-auto">
-          <nav className="flex flex-col gap-1 px-4 text-sm font-medium">
+          <nav className="flex flex-col gap-1 px-4 text-sm font-medium" key={"sidebar"}>
             {menuItems.map((item) => (
               <>
                 <SidebarItem 
