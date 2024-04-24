@@ -43,7 +43,9 @@ export const FormCoupon = ({ coupon }: Props) => {
 
   async function onSubmit(values: z.infer<typeof couponSchema>) {
     try {
-      const response = coupon ? await updateCoupon(values) : await createCoupon(values);
+      const response = coupon
+        ? await updateCoupon(values)
+        : await createCoupon(values);
 
       if (!response.ok) {
         toast({
@@ -70,7 +72,6 @@ export const FormCoupon = ({ coupon }: Props) => {
         className: "bg-red-500 text-white",
       });
     }
-    
   }
 
   return (
@@ -80,12 +81,9 @@ export const FormCoupon = ({ coupon }: Props) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <Form {...form}>
-          {JSON.stringify(form.formState.errors)}
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
-             <FormField
+  
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
               control={form.control}
               name="code"
               render={({ field }) => (
@@ -100,7 +98,6 @@ export const FormCoupon = ({ coupon }: Props) => {
                 </FormItem>
               )}
             />
-
 
             <FormField
               control={form.control}
@@ -121,7 +118,6 @@ export const FormCoupon = ({ coupon }: Props) => {
                   <FormMessage className="text-red-500" />
                 </FormItem>
               )}
-
             />
 
             <FormField
@@ -145,8 +141,6 @@ export const FormCoupon = ({ coupon }: Props) => {
               )}
             />
 
-
-
             <FormField
               control={form.control}
               name="startsAt"
@@ -169,7 +163,6 @@ export const FormCoupon = ({ coupon }: Props) => {
                   <FormMessage className="text-red-500" />
                 </FormItem>
               )}
-
             />
 
             <FormField
@@ -194,16 +187,11 @@ export const FormCoupon = ({ coupon }: Props) => {
                   <FormMessage className="text-red-500" />
                 </FormItem>
               )}
-
             />
-
 
             <Button type="submit" className="w-full">
               {coupon ? "Editar cupón" : "Crear cupón"}
-
             </Button>
- 
-
           </form>
         </Form>
       </CardContent>

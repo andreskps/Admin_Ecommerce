@@ -21,6 +21,7 @@ export const createCoupon = async (coupon: Coupon) => {
         body: JSON.stringify(coupon)
     });
 
+    console.log(await response.json())
     return response
 
 }
