@@ -26,7 +26,10 @@ export const createDiscount = async (discount: Discount) => {
 
 export const updateDiscount = async (discount: Discount) => {
 
-    const {id,...res} = discount
+    const {id,expiresAt,startsAt,...res} = discount
+
+
+    
 
     const session = await getSessionClient();
 
@@ -41,8 +44,13 @@ export const updateDiscount = async (discount: Discount) => {
             Accept: "application/json",
             Authorization: `Bearer ${session.user.access_token}`,
         },
-        body: JSON.stringify(res)
+        body: JSON.stringify({
+            startsAt: discount.startsAt === "" ? null : discount.startsAt,
+            expiresAt: discount.expiresAt === "" ? null : discount.expiresAt,
+            ...res
+        })
     });
+
 
     return response
 }
