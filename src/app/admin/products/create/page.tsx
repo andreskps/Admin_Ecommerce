@@ -1,39 +1,38 @@
 import { FormCreateProduct } from "@/components/admin/products/FormCreateProduct";
 import { FormProduct } from "@/components/admin/products/FormProduct";
+import { getDiscounts } from "@/lib/api/discounts";
 
-export default async function CreateProductPage() {
-  const fetchCategories = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
-    method: 'GET',
+const fetchData = async (url: string) => {
+  const response = await fetch(url, {
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
-    cache: 'no-cache',
+    cache: "no-cache",
   });
 
-  const fetchBrands = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`, {
-    method: 'GET',
-    cache: 'no-cache',
-  });
-
-  const fetchPets = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pets`, {
-    method: 'GET',
-    cache: 'no-cache',
-  });
-
-
-
-  const [responseCategories, responseBrands,responsePets] = await Promise.all([fetchCategories, fetchBrands,fetchPets]);
-
-  if (!responseCategories.ok || !responseBrands.ok || !responsePets.ok) {
-    throw new Error(`Error: ${responseCategories.status} ${responseCategories.statusText} or ${responseBrands.status} ${responseBrands.statusText}`);
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
   }
 
-  const categories = await responseCategories.json();
-  const brands = await responseBrands.json();
-  const pets = await responsePets.json();
+  return response.json();
+};
+
+export default async function CreateProductPage() {
+  const [categories, brands, pets, discounts] = await Promise.all([
+    fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`),
+    fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`),
+    fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/pets`),
+    fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/discounts`),
+  ]);
 
   return (
-    <FormCreateProduct categories={categories} brands={brands} pets={pets} />
+    <FormCreateProduct
+      categories={categories}
+      brands={brands}
+      pets={pets}
+      discounts={discounts}
+    />
   );
 }

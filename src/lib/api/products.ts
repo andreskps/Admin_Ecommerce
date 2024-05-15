@@ -123,6 +123,10 @@ export const updateVariant = async (variant: {
 export const updateProduct = async (productData: ProductSchema) => {
   const { id, categoryId, variants, ...rest } = productData;
 
+
+
+
+
   try {
     const session = await getSessionClient();
 
@@ -139,7 +143,10 @@ export const updateProduct = async (productData: ProductSchema) => {
           Accept: "application/json",
           Authorization: `Bearer ${session.user.access_token}`,
         },
-        body: JSON.stringify(rest),
+        body: JSON.stringify({
+          ...rest,
+          discountId: rest.discountId === 0 ? null : rest.discountId,
+        }),
       }
     );
 

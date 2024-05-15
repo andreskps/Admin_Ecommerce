@@ -22,10 +22,14 @@ export default async function AdminLayout({
       {/* <Sidebar /> */}
 
       <div className="flex h-screen ">
+    <div className="w-64"> {/* Ajusta el ancho según tus necesidades */}
         <Sidebar />
+    </div>
 
-        <main className="w-full pt-16">{children}</main>
-      </div>
+    <main className="flex-1 pt-16 ">
+        {children}
+    </main>
+</div>
     </>
   );
 }

@@ -2,6 +2,25 @@ import { Discount } from "@/validations/discountSchema";
 
 import { getSession as getSessionClient } from "next-auth/react";
 
+export const getDiscounts = async () => {
+  const fetchDiscounts = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/discounts`, {
+    method: 'GET',
+    cache: 'no-cache',
+  });
+
+  const response = await fetchDiscounts;
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
+  }
+
+  const data:Discount[] = await response.json();
+
+  return data;
+};
+
+
+
 export const createDiscount = async (discount: Discount) => {
   const session = await getSessionClient();
 

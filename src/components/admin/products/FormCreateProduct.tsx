@@ -40,6 +40,8 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { FilesUpload } from "@/components/ui/files-upload";
 import CardImages from "./CardImages";
+import { getDiscounts } from "@/lib/api/discounts";
+import { Discount } from "@/validations/discountSchema";
 
 type Category = {
   id: number;
@@ -61,6 +63,7 @@ type Pets = {
   id: number;
   name: string;
 };
+
 interface Props {
   product?: {
     id: string;
@@ -82,6 +85,7 @@ interface Props {
   categories: Category[];
   brands?: Brands[];
   pets?: Pets[];
+  discounts?: Discount[];
 }
 
 export const FormCreateProduct = ({
@@ -89,6 +93,7 @@ export const FormCreateProduct = ({
   categories,
   brands,
   pets,
+  discounts,
 }: Props) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -101,10 +106,6 @@ export const FormCreateProduct = ({
 
   const [files, setFiles] = useState<File[]>([]);
 
-  const onUpload = (files: File[]) => {
-    setFiles(files);
-  };
-
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -112,6 +113,10 @@ export const FormCreateProduct = ({
       images: [],
     },
   });
+
+  const onUpload = (files: File[]) => {
+    setFiles(files);
+  };
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -248,7 +253,6 @@ export const FormCreateProduct = ({
 
       router.refresh();
       router.push("/admin/products");
-  
     } catch (error) {
       showErrorToast(
         "Error al crear producto",
@@ -464,6 +468,45 @@ export const FormCreateProduct = ({
                           {pets?.map((pet) => (
                             <SelectItem key={pet.id} value={pet.id.toString()}>
                               {pet.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="discountId"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="discountId">
+                    Descuento
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        form.setValue("discountId", parseInt(value));
+                      }}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleccione descuento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+              
+                        <SelectItem value="0">Sin descuento</SelectItem>
+                          {discounts?.map((discount) => (
+                            <SelectItem
+                              key={discount.id}
+                              value={discount.id?.toString() ?? ""}
+                            >
+                              {discount.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>

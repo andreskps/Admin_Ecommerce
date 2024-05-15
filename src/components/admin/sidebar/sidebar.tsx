@@ -71,6 +71,21 @@ const menuItems: MenuItem[] = [
     icon: <FiUsers />,
     path: "/clientes",
   },
+  {
+    title: "Ofertas",
+    icon: <FiDollarSign />,
+    subLinks: [
+      {
+        title: "Descuentos",
+        path: "/admin/discounts",
+      },
+      {
+        title: "Cupones",
+        path: "/admin/coupons",
+      },
+    ],
+
+  }
 ];
 
 export function Sidebar() {
