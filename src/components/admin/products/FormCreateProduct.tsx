@@ -230,6 +230,15 @@ export const FormCreateProduct = ({
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
     try {
+
+       if (!values.variants || values.variants.length === 0) {
+      return showErrorToast(
+        "Error al crear producto",
+        "El producto debe tener al menos una variante"
+      );
+    }
+     
+
       if (files.length > 0) {
         const urls: string[] = await uploadImages(files);
         values.images = urls;
@@ -299,6 +308,22 @@ export const FormCreateProduct = ({
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="Nombre del producto" {...field} />
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="slug">
+                    Slug
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="Slug" {...field} />
                   </FormControl>
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -543,6 +568,7 @@ export const FormCreateProduct = ({
                             <SelectGroup>
                               <SelectItem value="color">Color</SelectItem>
                               <SelectItem value="size">Tamaño</SelectItem>
+                              <SelectItem value="peso">Peso</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>

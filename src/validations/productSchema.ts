@@ -4,6 +4,7 @@ import { z } from "zod";
 export const productSchema = z.object({
     id: z.string().optional(),
     title: z.string().min(2, "El titulo no puede tener mas de 255 caracteres"),
+    slug: z.string().optional(),
     description: z.string().min(10, "La descripcion no puede tener menos de 10 caracteres"),
     subCategoryId: z.number(),
     categoryId: z.number(),
