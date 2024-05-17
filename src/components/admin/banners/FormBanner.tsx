@@ -9,7 +9,6 @@ import {
   FormMessage,
   FormLabel,
   FormControl,
-  FormDescription,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FilesUpload } from "@/components/ui/files-upload";
+import { createBanner } from "@/lib/api/banner";
 
 interface Props {
   banner?: z.infer<typeof bannerSchema>;
@@ -40,8 +40,25 @@ export const FormBanner = ({ banner }: Props) => {
 
   async function onSubmit(values: z.infer<typeof bannerSchema>) {
     // Create banner
-    console.log(values);
-    console.log(files);
+    try {
+      setLoading(true);
+      const res = await createBanner({
+        name: values.name,
+        files,
+      });
+
+      if (!res.ok) {
+        alert("Ocurrió un error al crear el banner");
+        return;
+      }
+
+      alert("Banner creado con éxito");
+
+      router.refresh();
+      router.push("/admin/banners");
+    } catch (error) {
+      alert("Ocurrió un error al crear el banner");
+    }
   }
 
   return (
@@ -58,10 +75,10 @@ export const FormBanner = ({ banner }: Props) => {
               name="name"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="name"
-                  className="text-sm"
-                  >Nombre</FormLabel>
-        
+                  <FormLabel htmlFor="name" className="text-sm">
+                    Nombre
+                  </FormLabel>
+
                   <FormControl>
                     <Input placeholder="Nombre del banner" {...field} />
                   </FormControl>
