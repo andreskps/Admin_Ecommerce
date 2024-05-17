@@ -9,14 +9,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getSession as getSessionClient } from "next-auth/react";
 import { Products } from "@/data/products";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import Link from "next/link";
-import { DeleteProduct } from "./DeleteProduct";
 import { deleteProduct } from "@/lib/api/products";
 import { useToast } from "@/components/ui/use-toast";
 import { CellAction } from "./cellAction";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 export const columsProducts: ColumnDef<Products>[] = [
   {
@@ -40,61 +41,64 @@ export const columsProducts: ColumnDef<Products>[] = [
     header: "Descripción",
     accessorKey: "description",
   },
+  // {
+  //   header: "Estado",
+  //   accessorKey: "status",
+  // },
   {
-    header: "Estado",
-    accessorKey: "status",
-  },
+    id: "isPopular",
+    header: ({column}) => (
+      <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+      Popular
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+    ),
+    accessorKey: "isPopular",
+    cell: ({ row }) => {
+      const updateProduct = useUpdateProduct();
 
-  //   {
-  //     id: "select",
-  //     header: ({ table }) => (
-  //       <Checkbox
-  //         checked={
-  //           table.getIsAllPageRowsSelected() ||
-  //           (table.getIsSomePageRowsSelected() && "indeterminate")
-  //         }
-  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //         aria-label="Select all"
-  //       />
-  //     ),
-  //     cell: ({ row }) => (
-  //       <Checkbox
-  //         checked={row.getIsSelected()}
-  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //         aria-label="Select row"
-  //       />
-  //     ),
-  //   },
-  // {
-  //   id: "isPopular",
-  //   header: "Popular",
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.original.isPopular}
-  //       onCheckedChange={(value) => {
-  //         // Aquí puedes manejar el cambio de estado del checkbox.
-  //         // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
-  //         console.log(`Producto ${row.original.id} popular: ${value}`);
-  //       }}
-  //       aria-label="Marcar como popular"
-  //     />
-  //   ),
-  // },
-  // {
-  //   id: "isActive",
-  //   header: "Activo",
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.original.isActive}
-  //       onCheckedChange={(value) => {
-  //         // Aquí puedes manejar el cambio de estado del checkbox.
-  //         // Por ejemplo, puedes llamar a una función para actualizar el estado del producto en tu base de datos.
-  //         console.log(`Producto ${row.original.id} activo: ${value}`);
-  //       }}
-  //       aria-label="Marcar como popular"
-  //     />
-  //   ),
-  // },
+      return (
+        <Checkbox
+          checked={row.original.isPopular}
+          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isPopular")}
+          aria-label="Marcar como popular"
+        />
+      );
+    },
+  },
+  {
+    id: "isNew",
+    header: "Nuevos",
+    cell: ({ row }) => {
+      const updateProduct = useUpdateProduct();
+
+      return (
+        <Checkbox
+          checked={row.original.isNew}
+          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isNew")}
+          aria-label="Marcar como popular"
+        />
+      );
+    },
+  },
+  {
+    id: "isLowStock",
+    header: "Nuevos",
+    cell: ({ row }) => {
+      const updateProduct = useUpdateProduct();
+
+      return (
+        <Checkbox
+          checked={row.original.isLowStock}
+          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isLowStock")}
+          aria-label="Marcar como popular"
+        />
+      );
+    },
+  },
   {
     id: "actions",
     header: "",
@@ -108,3 +112,43 @@ export const columsProducts: ColumnDef<Products>[] = [
     ),
   },
 ];
+
+// Este es tu nuevo Hook personalizado
+function useUpdateProduct() {
+  const router = useRouter();
+
+  return useCallback(
+    async (id: string, value: boolean, property: string) => {
+      const session = await getSessionClient();
+
+      if (!session || !session.user?.access_token) {
+        throw new Error("No se pudo obtener la sesión o el token de acceso.");
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${session.user.access_token}`,
+          },
+          body: JSON.stringify({
+            [property]: value,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        router.refresh();
+      } else {
+        const { error } = await response.json();
+        console.error(error);
+      }
+
+      console.log(`Producto ${id} ${property}: ${value}`);
+    },
+    [router]
+  );
+}

@@ -6,6 +6,8 @@ export type Products = {
     title: string;
     description: string;
     isPopular?: boolean;
+    isNew?: boolean;
+    isLowStock?: boolean;
     isActive?: boolean;
 }
 

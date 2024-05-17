@@ -37,7 +37,8 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filters, setFilters] = useState<ColumnFiltersState>([]);
-   const [rowSelection, setRowSelection] = useState({})
+  const [rowSelection, setRowSelection] = useState({});
+  const [orderStatusFilter, setOrderStatusFilter] = useState("");
 
   const table = useReactTable({
     data,
@@ -57,13 +58,22 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters: filters,
-        rowSelection,
+      rowSelection,
     },
   });
 
+  const handleOrderStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setOrderStatusFilter(value);
+    setFilters((prevFilters) => [
+      ...prevFilters.filter((filter) => filter.id !== "orderStatus"),
+      value ? { id: "orderStatus", value } : null,
+    ].filter(Boolean) as ColumnFiltersState);
+  };
+
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 space-x-4">
         <Input
           placeholder={`Search by ${searchKey}`}
           value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
@@ -72,10 +82,22 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <select
+          value={orderStatusFilter}
+          onChange={handleOrderStatusChange}
+          className="border border-gray-300 rounded-md p-1"
+        >
+          <option value="">All Statuses</option>
+          <option value="procesando">Procesando</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="enviado">Enviado</option>
+          <option value="entregado">Entregado</option>
+          <option value="cancelado">Cancelado</option>
+          <option value="devuelto">Devuelto</option>
+        </select>
       </div>
       <div className="rounded-md border">
-        <Table className="w-full"
-        >
+        <Table className="w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

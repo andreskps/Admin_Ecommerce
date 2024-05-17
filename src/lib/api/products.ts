@@ -50,7 +50,6 @@ export const createProduct = async (productData: ProductSchema) => {
       }
     );
 
-    
     return response;
   } catch (error) {
     console.error(error);
@@ -123,10 +122,6 @@ export const updateVariant = async (variant: {
 export const updateProduct = async (productData: ProductSchema) => {
   const { id, categoryId, variants, ...rest } = productData;
 
-
-
-
-
   try {
     const session = await getSessionClient();
 
@@ -151,7 +146,6 @@ export const updateProduct = async (productData: ProductSchema) => {
     );
 
     return response;
-
   } catch (error) {
     console.error(error);
     throw error;
@@ -217,7 +211,6 @@ export const deleteProduct = async (id: string) => {
   }
 };
 
-
 export const deleteVariant = async (id: string) => {
   try {
     const session = await getSessionClient();
@@ -242,8 +235,7 @@ export const deleteVariant = async (id: string) => {
   } catch (error) {
     throw error;
   }
-}
-
+};
 
 export const uploadImages = async (files: File[]) => {
   try {
@@ -273,7 +265,6 @@ export const uploadImages = async (files: File[]) => {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
 
-
     const data = await response.json();
 
     return data;
@@ -281,7 +272,7 @@ export const uploadImages = async (files: File[]) => {
     console.error(error);
     throw error;
   }
-}
+};
 
 export const deleteImage = async (id: number) => {
   try {
@@ -300,7 +291,6 @@ export const deleteImage = async (id: number) => {
         },
       }
     );
- 
 
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -311,4 +301,4 @@ export const deleteImage = async (id: number) => {
     console.error(error);
     throw error;
   }
-}
+};
