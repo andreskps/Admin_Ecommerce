@@ -6,6 +6,8 @@ import React, { useCallback } from "react";
 import { CellAction } from "../products/cellAction";
 import { getSession as getSessionClient } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+
 
 export const columnsOrders: ColumnDef<OrderSchema>[] = [
   {
@@ -111,6 +113,7 @@ export const columnsOrders: ColumnDef<OrderSchema>[] = [
 
 function useUpdateOrder() {
   const router = useRouter();
+  const { toast } = useToast();
 
   return useCallback(
     async (id: string, value: string, field: string) => {
@@ -133,8 +136,20 @@ function useUpdateOrder() {
 
       
       if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Orden actualizada correctamente",
+          className: "bg-green-500 text-white",
+        });
         router.push("/admin/orders");
+        return;
       }
+
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la orden",
+        className: "bg-red-500 text-white",
+      });
     },
     [router]
   );
