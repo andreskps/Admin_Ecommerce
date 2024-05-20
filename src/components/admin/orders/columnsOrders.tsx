@@ -7,6 +7,7 @@ import { CellAction } from "../products/cellAction";
 import { getSession as getSessionClient } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 
 export const columnsOrders: ColumnDef<OrderSchema>[] = [
@@ -89,26 +90,21 @@ export const columnsOrders: ColumnDef<OrderSchema>[] = [
     accessorKey: "paymentMethod",
   },
   {
-    header: "Created At",
-    accessorKey: "createdAt",
-  },
-  {
-    header: "Updated At",
-    accessorKey: "updatedAt",
-  },
-  // {
-  //     id: "actions",
-  //     header: "",
-  //     cell: ({ row }) => (
-  //         <CellAction
-  //             key={row.original.id}
-  //             link="/admin/orders/edit"
-  //             id={row.original?.id?.toString() || ""}
-  //             onDeleted={deleteBrand}
-  //         />
-  //     ),
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+          // <CellAction
+          //     key={row.original.id}
+          //     link="/admin/orders/edit"
+          //     id={row.original?.id?.toString() || ""}
+          //     onDeleted={deleteBrand}
+          // />
+          <Link href={`/admin/orders/details/${row.original.id}`}>
+            Ver
+          </Link>
+      ),
 
-  // }
+  }
 ];
 
 function useUpdateOrder() {

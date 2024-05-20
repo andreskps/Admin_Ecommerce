@@ -14,81 +14,53 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { OrdenDetails } from "@/interfaces/orderDetails.interface";
 import { currencyFormat } from "@/lib/currencyFormat";
 import React from "react";
+import { getServerSession } from "next-auth";
+import { getSession } from "@/lib/api/config";
+import { authOptions } from "@/lib/authOptions";
 
-export default function OrderDetailsPage() {
-  const testOrder = {
-    name: "valeria",
-    lastName: "ochoa",
-    phone: "3225910259",
-    email: "vale@gmail.com",
-    namePet: "Mia",
-    priceShipping: 2000,
-    total: 93800,
-    orderStatus: "confirmado",
-    paymentMethod: "Pago contra entrega",
-    createdAt: "2024-05-15T18:30:34.292Z",
-    orderAddress: {
-      address: "calle 80",
-      neighborhood: "",
-      instructions: "casa 101",
-      municipio: {
-        name: "Bello",
-        state: {
-          name: "Antioquia",
-        },
-      },
-    },
-    orderItems: [
-      {
-        quantity: 1,
-        unitPrice: 18000,
-        productVariant: {
-          product: {
-            name: "Cuido Gato Agility",
-            image: {
-              url: "http://res.cloudinary.com/dftvxcvfw/image/upload/v1713530420/products/ahbeokk5ochsui7buuof.jpg",
-            },
-          },
-          attributes: [
-            {
-              name: "size",
-              value: "2kg",
-            },
-          ],
-        },
-      },
-      {
-        quantity: 5,
-        unitPrice: 36000,
-        productVariant: {
-          product: {
-            name: "Chunky Adulto Vida Activa",
-            image: {
-              url: "http://res.cloudinary.com/dftvxcvfw/image/upload/v1713530420/products/ahbeokk5ochsui7buuof.jpg",
-            },
-          },
-          attributes: [
-            {
-              name: "size",
-              value: "2kg",
-            },
-          ],
-        },
-      },
-    ],
+interface Props {
+  params: {
+    id: string;
   };
+}
 
-  // Ahora puedes usar este objeto para hacer pruebas
+export default async function OrderDetailsPage({ params }: Props) {
+  const { id } = params;
+  const session = await getSession();
 
+  if (!session) {
+    return <div>Unauthorized</div>;
+  }
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${session.user?.access_token}`,
+      },
+      cache: "no-cache",
+    }
+  );
+  if (response.status === 401) {
+    return <div>Unauthorized</div>;
+  }
+  if (!response.ok) {
+    return <div>Order not found</div>;
+  }
+
+  const order: OrdenDetails = await response.json();
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
       <div className="flex flex-col md:grid md:grid-cols-6 gap-6">
         <div className="md:col-span-4 lg:col-span-3 xl:col-span-4 flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Products</CardTitle>
+              <CardTitle>Productos</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -101,12 +73,12 @@ export default function OrderDetailsPage() {
                     <TableHead>Attributo</TableHead>
                     <TableHead>Valor</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Total</TableHead>
+                    <TableHead>Unit Price</TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {testOrder.orderItems.map((item, index) => (
+                  {order.orderItems.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="hidden md:table-cell">
                         <img
@@ -141,7 +113,7 @@ export default function OrderDetailsPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Payment</CardTitle>
+              <CardTitle>Pago</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
               {/* <div className="flex items-center">
@@ -154,14 +126,14 @@ export default function OrderDetailsPage() {
             </div> */}
               <div className="flex items-center">
                 <div>Shipping</div>
-                <div className="ml-auto">{
-                  currencyFormat(testOrder.priceShipping)}
+                <div className="ml-auto">
+                  {currencyFormat(order.priceShipping)}
                 </div>
               </div>
 
               <div className="flex items-center font-medium">
                 <div>Total</div>
-                <div className="ml-auto">{  currencyFormat(testOrder.total) }</div>
+                <div className="ml-auto">{currencyFormat(order.total)}</div>
               </div>
             </CardContent>
             {/* <CardFooter className="flex items-center gap-2">
@@ -176,15 +148,31 @@ export default function OrderDetailsPage() {
           <Card>
             <div>
               <CardHeader className="flex flex-row items-center space-y-0">
-                <CardTitle>Cliente</CardTitle>
+                <CardTitle>Detalles de la orden</CardTitle>
                 {/* <Button className="ml-auto" variant="secondary">
                 Edit
               </Button> */}
               </CardHeader>
               <CardContent className="text-sm">
                 <div className="grid gap-1">
-                  <div className="font-bold ">
-                    {testOrder.name} {testOrder.lastName}
+                  <div className="font-bold">Orden: #{order.id}</div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    {order.name} {order.lastName}
+                  </div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Mascoota: {order.namePet}
+                  </div>
+
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Estado: {order.orderStatus}
+                  </div>
+
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Método de pago: {order.paymentMethod}
+                  </div>
+
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Creado: {new Date(order.createdAt).toDateString()}
                   </div>
                 </div>
               </CardContent>
@@ -192,13 +180,13 @@ export default function OrderDetailsPage() {
 
             <div>
               <CardHeader>
-                <CardTitle>Contact information</CardTitle>
+                <CardTitle>Contacto</CardTitle>
               </CardHeader>
               <CardContent className="text-sm">
                 <div className="grid gap-1">
-                  <div className="font-bold">{testOrder.email}</div>
+                  <div className="font-bold">{order.email}</div>
                   <div className="text-gray-500 dark:text-gray-400">
-                    {testOrder.phone}
+                    {order.phone}
                   </div>
                 </div>
               </CardContent>
@@ -206,16 +194,16 @@ export default function OrderDetailsPage() {
 
             <div>
               <CardHeader>
-                <CardTitle>Shipping address</CardTitle>
+                <CardTitle>Dirección</CardTitle>
               </CardHeader>
               <CardContent className="text-sm">
                 <div>
-                  {testOrder.orderAddress.address}
+                  {order.orderAddress.address}
                   <br />
-                  {testOrder.orderAddress.municipio.name},{" "}
-                  {testOrder.orderAddress.municipio.state.name}
+                  {order.orderAddress.municipio.name},{" "}
+                  {order.orderAddress.municipio.state.name}
                   <br />
-                  {testOrder.orderAddress.instructions}
+                  {order.orderAddress.instructions}
                 </div>
               </CardContent>
             </div>

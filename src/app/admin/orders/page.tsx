@@ -1,13 +1,25 @@
 import { columnsOrders } from "@/components/admin/orders/columnsOrders";
 import { DataTable } from "@/components/admin/products/data-table";
 import { Heading } from "@/components/ui/heading";
+import { getSession } from "@/lib/api/config";
 
 export default async function OrdersPage() {
+  const session = await getSession();
+
+  if (!session) {
+    return <div>Unauthorized</div>;
+  }
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
     {
       method: "GET",
       cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${session.user?.access_token}`,
+      },
     }
   );
 

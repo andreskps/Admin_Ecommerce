@@ -62,7 +62,7 @@ const menuItems: MenuItem[] = [
     subLinks: [
       {
         title: "Lista de Ventas",
-        path: "/ventas",
+        path: "/admin/orders",
       },
     ],
   },
