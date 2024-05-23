@@ -1,6 +1,5 @@
 import { columsProducts } from "@/components/admin/products/columns";
 import { DataTable } from "@/components/admin/products/data-table";
-import { TableProducts } from "@/components/component/table";
 import Link from "next/link";
 import React from "react";
 import { getProductsAdmin } from "@/lib/api/products";
