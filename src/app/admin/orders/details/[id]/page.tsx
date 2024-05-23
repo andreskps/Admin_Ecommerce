@@ -20,6 +20,7 @@ import React from "react";
 import { getServerSession } from "next-auth";
 import { getSession } from "@/lib/api/config";
 import { authOptions } from "@/lib/authOptions";
+import Image from "next/image";
 
 interface Props {
   params: {
@@ -81,7 +82,7 @@ export default async function OrderDetailsPage({ params }: Props) {
                   {order.orderItems.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="hidden md:table-cell">
-                        <img
+                        <Image
                           alt="Product image"
                           className="aspect-square rounded-md object-cover"
                           height="64"

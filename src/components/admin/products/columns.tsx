@@ -18,6 +18,22 @@ import { useToast } from "@/components/ui/use-toast";
 import { CellAction } from "./cellAction";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { useUpdateProduct } from "@/hooks/useUpdateProduct";
+
+
+function CellComponent({ row, property, label }:any) {
+  const updateProduct = useUpdateProduct();
+
+  return (
+    <Checkbox
+      checked={row.original[property]}
+      onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), property)}
+      aria-label={label}
+    />
+  );
+}
+
+
 
 export const columsProducts: ColumnDef<Products>[] = [
   {
@@ -57,47 +73,17 @@ export const columsProducts: ColumnDef<Products>[] = [
     </Button>
     ),
     accessorKey: "isPopular",
-    cell: ({ row }) => {
-      const updateProduct = useUpdateProduct();
-
-      return (
-        <Checkbox
-          checked={row.original.isPopular}
-          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isPopular")}
-          aria-label="Marcar como popular"
-        />
-      );
-    },
+    cell: ({ row }) => <CellComponent row={row} property="isPopular" label="Marcar como popular" />,
   },
   {
     id: "isNew",
     header: "Nuevos",
-    cell: ({ row }) => {
-      const updateProduct = useUpdateProduct();
-
-      return (
-        <Checkbox
-          checked={row.original.isNew}
-          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isNew")}
-          aria-label="Marcar como popular"
-        />
-      );
-    },
+    cell: ({ row }) => <CellComponent row={row} property="isNew" label="Marcar como nuevo" />,
   },
   {
     id: "isLowStock",
     header: "Nuevos",
-    cell: ({ row }) => {
-      const updateProduct = useUpdateProduct();
-
-      return (
-        <Checkbox
-          checked={row.original.isLowStock}
-          onCheckedChange={(value) => updateProduct(row.original.id, Boolean(value), "isLowStock")}
-          aria-label="Marcar como popular"
-        />
-      );
-    },
+    cell: ({ row }) => <CellComponent row={row} property="isLowStock" label="Marcar como bajo stock" />,
   },
   {
     id: "actions",
@@ -114,41 +100,41 @@ export const columsProducts: ColumnDef<Products>[] = [
 ];
 
 // Este es tu nuevo Hook personalizado
-function useUpdateProduct() {
-  const router = useRouter();
+// function useUpdateProduct() {
+//   const router = useRouter();
 
-  return useCallback(
-    async (id: string, value: boolean, property: string) => {
-      const session = await getSessionClient();
+//   return useCallback(
+//     async (id: string, value: boolean, property: string) => {
+//       const session = await getSessionClient();
 
-      if (!session || !session.user?.access_token) {
-        throw new Error("No se pudo obtener la sesión o el token de acceso.");
-      }
+//       if (!session || !session.user?.access_token) {
+//         throw new Error("No se pudo obtener la sesión o el token de acceso.");
+//       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${session.user.access_token}`,
-          },
-          body: JSON.stringify({
-            [property]: value,
-          }),
-        }
-      );
+//       const response = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+//         {
+//           method: "PUT",
+//           headers: {
+//             "Content-Type": "application/json",
+//             Accept: "application/json",
+//             Authorization: `Bearer ${session.user.access_token}`,
+//           },
+//           body: JSON.stringify({
+//             [property]: value,
+//           }),
+//         }
+//       );
 
-      if (response.ok) {
-        router.refresh();
-      } else {
-        const { error } = await response.json();
-        console.error(error);
-      }
+//       if (response.ok) {
+//         router.refresh();
+//       } else {
+//         const { error } = await response.json();
+//         console.error(error);
+//       }
 
-      console.log(`Producto ${id} ${property}: ${value}`);
-    },
-    [router]
-  );
-}
+//       console.log(`Producto ${id} ${property}: ${value}`);
+//     },
+//     [router]
+//   );
+// }

@@ -84,7 +84,10 @@ const menuItems: MenuItem[] = [
         path: "/admin/coupons",
       },
     ],
-
+  },{
+    title:"Banners",
+    icon:<FiDollarSign />,
+    path:"/admin/banners"
   }
 ];
 
