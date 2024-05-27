@@ -25,7 +25,7 @@ export const columsPets: ColumnDef<Pet>[] = [
     cell: ({ row }) => (
       <CellAction
         key={row.original.id}
-        link="/admin/brands/edit"
+        link="/admin/pets/edit"
         id={row.original?.id?.toString() || ""}
         onDeleted={deletePet}
       />

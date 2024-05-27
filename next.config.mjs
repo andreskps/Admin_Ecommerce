@@ -1,12 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-//     experimental: {
-//         staticGenerationStore: true,
-//       },
- 
-// };
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
 
+  //     experimental: {
+  //         staticGenerationStore: true,
+  //       },
 
-}
+  // };
+};
 
 export default nextConfig;
