@@ -20,11 +20,12 @@ const fetchData = async (url: string) => {
 };
 
 export default async function CreateProductPage() {
-  const [categories, brands, pets, discounts] = await Promise.all([
+  const [categories, brands, pets, discounts,providers] = await Promise.all([
     fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`),
     fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`),
     fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/pets`),
     fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/discounts`),
+    fetchData(`${process.env.NEXT_PUBLIC_API_URL}/api/providers`),
   ]);
 
   return (
@@ -33,6 +34,7 @@ export default async function CreateProductPage() {
       brands={brands}
       pets={pets}
       discounts={discounts}
+      providers={providers}
     />
   );
 }

@@ -59,6 +59,10 @@ type Brands = {
   name: string;
 };
 
+type Providers = {
+  id: number;
+  name: string;
+}
 type Pets = {
   id: number;
   name: string;
@@ -86,6 +90,7 @@ interface Props {
   brands?: Brands[];
   pets?: Pets[];
   discounts?: Discount[];
+  providers?: Providers[];
 }
 
 export const FormCreateProduct = ({
@@ -94,6 +99,7 @@ export const FormCreateProduct = ({
   brands,
   pets,
   discounts,
+  providers
 }: Props) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -503,6 +509,44 @@ export const FormCreateProduct = ({
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="providerId"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel className="text-sm" htmlFor="providerId">
+                    Proveedor
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        form.setValue("providerId", parseInt(value));
+                      }}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleccione proveedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {providers?.map((provider) => (
+                            <SelectItem
+                              key={provider.id}
+                              value={provider.id.toString()}
+                            >
+                              {provider.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
+
 
             <FormField
               control={form.control}
