@@ -11,7 +11,7 @@ export const productSchema = z.object({
     discountId: z.number().optional(),
     brandId: z.number().optional(),
     providerId: z.number().optional(),
-    petId: z.number(),
+    petId: z.number().optional(),
     images: z.array(z.string()).optional(),
     variants: z.array(
         z.object({
