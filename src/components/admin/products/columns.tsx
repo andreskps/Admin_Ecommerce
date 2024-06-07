@@ -82,7 +82,7 @@ export const columsProducts: ColumnDef<Products>[] = [
   },
   {
     id: "isLowStock",
-    header: "Nuevos",
+    header: "Pocas unidades",
     cell: ({ row }) => <CellComponent row={row} property="isLowStock" label="Marcar como bajo stock" />,
   },
   {

@@ -66,11 +66,11 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  {
-    title: "Clientes",
-    icon: <FiUsers />,
-    path: "/clientes",
-  },
+  // {
+  //   title: "Clientes",
+  //   icon: <FiUsers />,
+  //   path: "/clientes",
+  // },
   {
     title: "Ofertas",
     icon: <FiDollarSign />,
